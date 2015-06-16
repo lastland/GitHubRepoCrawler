@@ -21,11 +21,9 @@ object Main extends App {
     case "run" :: Nil =>
       val repos = new GitHubRepos
       val stream = repos.searchLanguage("Java") #::: repos.searchLanguage("Scala")
-      GitHubRepoDatabase.DB.withDynSession {
-        for (repo <- stream) {
-          Future {
-            GitHubRepoDatabase.addRepo(repo)
-          }
+      for (repo <- stream) {
+        GitHubRepoDatabase.DB.withDynSession {
+          GitHubRepoDatabase.addRepo(repo)
         }
       }
   }
