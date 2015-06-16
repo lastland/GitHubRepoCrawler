@@ -1,8 +1,6 @@
 /**
  * Created by lastland on 15/6/16.
  */
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.slick.driver.H2Driver.simple._
 import Database.dynamicSession
 import scala.slick.jdbc.StaticQuery._

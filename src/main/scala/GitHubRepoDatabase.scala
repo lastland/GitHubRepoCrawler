@@ -2,7 +2,6 @@
  * Created by lastland on 15/6/16.
  */
 import scala.slick.driver.H2Driver.simple._
-import Database.dynamicSession
 
 object GitHubRepoDatabase {
   val dburl = "jdbc:h2:./test.tb"
