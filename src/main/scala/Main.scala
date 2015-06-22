@@ -1,6 +1,8 @@
 /**
  * Created by lastland on 15/6/16.
  */
+
+import org.xml.sax.SAXParseException
 import scala.slick.driver.H2Driver.simple._
 import Database.dynamicSession
 import scala.slick.jdbc.StaticQuery._
@@ -23,6 +25,30 @@ object Main extends App {
         GitHubRepoDatabase.DB.withDynSession {
           GitHubRepoDatabase.addRepo(repo)
         }
+      }
+    case "filter" :: Nil =>
+      GitHubRepoDatabase.DB.withDynSession {
+        var current = 0
+        var result: List[GitHubRepo] = List()
+        for (repo <- gitHubRepos) {
+          println("trying " + repo.toGitHubRepo)
+          try {
+            val r = repo.toGitHubRepo
+            val build = Build.createBuild(r)
+            if (build.dependencies.exists(_.contains("akka"))) {
+              result = r :: result
+            }
+            current = current + 1
+            if (current % 100 == 0)
+              println(s"Current result = ${result.size}")
+          } catch {
+            case ex: NoRecognizableBuildException => ()
+            case ex: PomEmptyException => ()
+            case ex: SAXParseException => ()
+          }
+        }
+        println(result.size)
+        println(result)
       }
   }
 }
