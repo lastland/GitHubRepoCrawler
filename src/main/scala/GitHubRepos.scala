@@ -6,7 +6,8 @@ import net.ruippeixotog.scalascraper.browser.Browser
 import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.dsl.DSL.Parse._
-import org.jsoup.HttpStatusException
+
+import scala.util.{Failure, Success}
 
 object GitHubRepo {
   def fromName(name: String): GitHubRepo = {
@@ -37,19 +38,13 @@ class GitHubRepos {
   protected def searchPage(browser: Browser, queries: List[String], pageNum: Int,
                            sleepTime: Int = 1000): Stream[GitHubRepo] = {
     val link = searchLink + "?" + (s"p=$pageNum" :: queries).mkString("&")
-    try {
-      val page = browser.get(link)
-      val repoNames = (page >> elements("h3.repo-list-name")).map(_ >> text("a"))
-      repoNames.map(GitHubRepo.fromName(_)).toStream #::: searchPage(browser, queries, pageNum + 1)
-    } catch {
-      case statusException: HttpStatusException =>
-        println(statusException)
-        if (statusException.getStatusCode == 429) {
-          Thread.sleep(sleepTime)
-          searchPage(browser, queries, pageNum, List(sleepTime * 2, 60000).min)
-        } else {
-          Stream.empty
-        }
+    val doc = PageGetter.get(browser, link)
+    doc match {
+      case Success(page) =>
+        val repoNames = (page >> elements("h3.repo-list-name")).map(_ >> text("a"))
+        repoNames.map(GitHubRepo.fromName(_)).toStream #::: searchPage(browser, queries, pageNum + 1)
+      case Failure(ex) =>
+        Stream.empty
     }
   }
 }

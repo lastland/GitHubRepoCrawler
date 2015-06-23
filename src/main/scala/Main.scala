@@ -2,7 +2,9 @@
  * Created by lastland on 15/6/16.
  */
 
-import org.xml.sax.SAXParseException
+import java.util.concurrent.ConcurrentHashMap
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.slick.driver.H2Driver.simple._
 import Database.dynamicSession
 import scala.slick.jdbc.StaticQuery._
@@ -27,28 +29,26 @@ object Main extends App {
         }
       }
     case "filter" :: Nil =>
+      val result = new ConcurrentHashMap[GitHubRepo, Unit]()
       GitHubRepoDatabase.DB.withDynSession {
-        var current = 0
-        var result: List[GitHubRepo] = List()
         for (repo <- gitHubRepos) {
-          println("trying " + repo.toGitHubRepo)
-          try {
-            val r = repo.toGitHubRepo
-            val build = Build.createBuild(r)
-            if (build.dependencies.exists(_.contains("akka"))) {
-              result = r :: result
+          val r = repo.toGitHubRepo
+          val f = Future {
+            println(s"trying $r")
+            val detector = new GitHubRepoImportDetector(r.owner + "/" + r.name)
+            val t = detector.imports exists { im =>
+              im.contains("java.util.concurrent")
             }
-            current = current + 1
-            if (current % 100 == 0)
-              println(s"Current result = ${result.size}")
-          } catch {
-            case ex: NoRecognizableBuildException => ()
-            case ex: PomEmptyException => ()
-            case ex: SAXParseException => ()
+            if (t) {
+              result.put(r, ())
+            }
+            r
+          }
+          f onSuccess {
+            case r: GitHubRepo =>
+              println(s"$r finished, currently we have ${result.size()}")
           }
         }
-        println(result.size)
-        println(result)
       }
   }
 }
