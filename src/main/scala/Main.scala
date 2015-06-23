@@ -34,19 +34,21 @@ object Main extends App {
         for (repo <- gitHubRepos) {
           val r = repo.toGitHubRepo
           val f = Future {
-            println(s"trying $r")
-            val detector = new GitHubRepoImportDetector(r.owner + "/" + r.name)
-            val t = detector.imports exists { im =>
-              im.contains("java.util.concurrent")
-            }
-            if (t) {
-              result.put(r, ())
+            if (r.commitNum >= 100 && r.releaseNum >= 5 && r.branchNum > 1) {
+              println(s"trying $r")
+              val detector = new GitHubRepoImportDetector(r.owner + "/" + r.name)
+              val t = detector.imports exists { im =>
+                im.contains("java.util.concurrent")
+              }
+              if (t) {
+                result.put(r, ())
+              }
             }
             r
           }
           f onSuccess {
             case r: GitHubRepo =>
-              println(s"$r finished, currently we have ${result.size()}")
+                println(s"$r finished, currently we have ${result.size()}")
           }
         }
       }
