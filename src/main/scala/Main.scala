@@ -3,6 +3,7 @@
  */
 
 import java.util.concurrent.ConcurrentHashMap
+import com.typesafe.scalalogging.StrictLogging
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.slick.driver.H2Driver.simple._
@@ -10,7 +11,7 @@ import Database.dynamicSession
 import scala.slick.jdbc.StaticQuery._
 import Tables._
 
-object Main extends App {
+object Main extends App with StrictLogging {
   args.toList match {
     case "init" :: Nil =>
       GitHubRepoDatabase.DB.withDynSession {
@@ -35,7 +36,7 @@ object Main extends App {
           val r = repo.toGitHubRepo
           val f = Future {
             if (r.commitNum >= 100 && r.releaseNum >= 5 && r.branchNum > 1) {
-              println(s"trying $r")
+              logger.info(s"trying $r")
               val detector = new GitHubRepoImportDetector(r.owner + "/" + r.name)
               val t = detector.imports exists { im =>
                 im.contains("java.util.concurrent")
@@ -48,7 +49,7 @@ object Main extends App {
           }
           f onSuccess {
             case r: GitHubRepo =>
-                println(s"$r finished, currently we have ${result.size()}")
+                logger.info(s"$r finished, currently we have ${result.size()}")
           }
         }
       }
