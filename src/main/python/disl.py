@@ -330,7 +330,6 @@ def flatten_all(object):
 ######################################################################
 def parse_arguments(parser):
 	args = parser.parse_args()
-	print args.dc
 
 	args.c_opts = flatten_all(args.c_opts)
 	args.c_app = flatten_all(args.c_app)
