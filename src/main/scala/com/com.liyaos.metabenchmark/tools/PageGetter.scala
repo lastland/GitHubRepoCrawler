@@ -1,3 +1,5 @@
+package com.liyaos.metabenchmark.tools
+
 /**
  * Created by lastland on 15/6/23.
  */

@@ -1,6 +1,9 @@
+package com.liyaos.metabenchmark.tools
+
 /**
  * Created by lastland on 15/6/22.
  */
+
 import scala.io.Source
 import scala.collection.immutable.Set
 import net.ruippeixotog.scalascraper.browser.Browser

@@ -1,11 +1,13 @@
+package com.liyaos.metabenchmark.tools
+
 /**
  * Created by lastland on 15/6/16.
  */
 
+import com.liyaos.metabenchmark.database.Tables
 import net.ruippeixotog.scalascraper.browser.Browser
-import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
-import net.ruippeixotog.scalascraper.dsl.DSL.Parse._
+import net.ruippeixotog.scalascraper.dsl.DSL._
 
 import scala.util.{Failure, Success}
 

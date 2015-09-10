@@ -1,8 +1,12 @@
+package com.liyaos.metabenchmark.database
+
 /**
  * Created by lastland on 15/6/16.
  */
 
+import com.liyaos.metabenchmark.tools.GitHubRepo
 import com.typesafe.scalalogging.LazyLogging
+
 import scala.slick.driver.H2Driver.simple._
 
 object GitHubRepoDatabase extends LazyLogging {
@@ -11,7 +15,7 @@ object GitHubRepoDatabase extends LazyLogging {
   lazy val DB = Database.forURL(dburl, driver = driver)
 
   def addRepo(repo: GitHubRepo)(implicit session: Session) = {
-    import Tables._
+    import com.liyaos.metabenchmark.database.Tables._
     logger.debug("inserting " + repo)
     val matchingRepo = gitHubRepos.filter { r =>
       r.owner === repo.owner && r.repo === repo.name

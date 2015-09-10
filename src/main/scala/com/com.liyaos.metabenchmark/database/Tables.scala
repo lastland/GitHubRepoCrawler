@@ -1,6 +1,11 @@
+package com.liyaos.metabenchmark.database
+
 /**
  * Created by lastland on 15/6/16.
  */
+
+import com.liyaos.metabenchmark.tools.GitHubRepo
+
 import scala.slick.driver.H2Driver.simple._
 
 object Tables {
