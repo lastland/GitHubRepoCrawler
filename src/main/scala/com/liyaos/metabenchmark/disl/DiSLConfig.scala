@@ -9,9 +9,10 @@ import com.liyaos.metabenchmark.tools.ScriptInstaller
 
 object DiSLConfig {
   private lazy val config = ConfigFactory.load()
-  lazy val dislProgram = config.getString("disl.program")
+  lazy val dislProgram = installationDir + "/src/main/python/disl.py"
   lazy val dislHome = config.getString("disl.home")
-  lazy val instProgram = "/Users/lastland/workspace/graal-profiler/GitHubRepoMiner/build-inst/example-inst.jar"
-
+  lazy val instDir = installationDir +
+    "/target/scala-2.11/classes/com/liyaos/metabenchmark/instrumentation"
+  lazy val instProgram = instDir + "/Instrumentation.class"
   lazy val installationDir = new File(System.getProperty("user.dir")).getAbsolutePath
 }

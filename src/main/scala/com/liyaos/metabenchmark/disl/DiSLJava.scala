@@ -9,7 +9,7 @@ import com.liyaos.metabenchmark.tools.ScriptInstaller
 object DiSLJava extends ScriptInstaller {
   def content =
     s"""|#!/bin/bash
-        |${DiSLConfig.dislProgram} -d ${DiSLConfig.dislHome} -cs ${DiSLConfig.instProgram} -- "$$@"
+        |${DiSLConfig.dislProgram} -d ${DiSLConfig.dislHome} -dc ${DiSLConfig.instProgram} -cs ${DiSLConfig.instDir} -- "$$@"
      """.stripMargin
 
   val dir = DiSLConfig.installationDir + "/java"
