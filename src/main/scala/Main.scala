@@ -5,6 +5,7 @@
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
+import com.liyaos.metabenchmark.disl.{DiSLMvn, DiSLJava}
 import com.typesafe.scalalogging.StrictLogging
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,15 +14,21 @@ import Database.dynamicSession
 import scala.slick.jdbc.StaticQuery._
 
 import com.liyaos.metabenchmark.database.{GitHubRepoDatabase, Tables}
-import com.liyaos.metabenchmark.tools.{GitHubRepoImportDetector, GitHubRepo, GitHubRepos, GitHubDownloader}
+import com.liyaos.metabenchmark.tools._
 import Tables._
 
 object Main extends App with StrictLogging {
   args.toList match {
     case "init" :: Nil =>
-      GitHubRepoDatabase.DB.withDynSession {
-        gitHubRepos.ddl.create
+      try {
+        GitHubRepoDatabase.DB.withDynSession {
+          gitHubRepos.ddl.create
+        }
+      } catch {
+        case e => println(e)
       }
+      DiSLJava.install()
+      DiSLMvn.install()
     case "reset" :: Nil =>
       GitHubRepoDatabase.DB.withDynSession {
         updateNA("DROP ALL OBJECTS DELETE FILES").execute
@@ -55,7 +62,7 @@ object Main extends App with StrictLogging {
           f onSuccess {
             case r: GitHubRepo =>
               val download = new GitHubDownloader(r)
-              val tester = download.downloadTo("./tmp/").getTester()
+              val tester = new MavenRepoTester(download.downloadTo("./tmp/").path, Some(DiSLMvn.dir))
               val exitCode = tester.test()
               println(s"Test results for $r: $exitCode")
           }

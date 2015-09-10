@@ -17,11 +17,11 @@ class GitHubDownloader(repo: GitHubRepo) {
   }
 }
 
-abstract class LocalGitHubRepo(path: String) {
+abstract class LocalGitHubRepo(val path: String) {
   def getTester(): RepoTester
 }
 
-class LocalGitHubMavenRepo(path: String) extends LocalGitHubRepo(path) {
+class LocalGitHubMavenRepo(override val path: String) extends LocalGitHubRepo(path) {
   def getTester(): RepoTester = {
     new MavenRepoTester(path)
   }

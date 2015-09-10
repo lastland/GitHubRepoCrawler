@@ -10,8 +10,12 @@ abstract class RepoTester(path: String) {
   def test(): Int
 }
 
-class MavenRepoTester(path: String) extends RepoTester(path) {
+class MavenRepoTester(path: String, mvn: Option[String] = None) extends RepoTester(path) {
   override def test() = {
-    Process(Seq("mvn", "test"), new File(path)).!
+    val mvnProgram = mvn match {
+      case None => "mvn"
+      case Some(s) => s
+    }
+    Process(Seq(mvnProgram, "test"), new File(path)).!
   }
 }
