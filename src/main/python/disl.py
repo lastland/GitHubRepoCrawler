@@ -538,9 +538,9 @@ def main():
 	if args.cse == True:
 		run_evaluation(args, parser)
 
-	if args.cs == True or args.cse == True:
-		time.sleep(3)
-		run_client(args, parser)
+	#if args.cs == True or args.cse == True:
+		#time.sleep(3)
+		#run_client(args, parser)
 
 	return
 

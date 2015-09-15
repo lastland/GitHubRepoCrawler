@@ -11,8 +11,7 @@ object DiSLConfig {
   private lazy val config = ConfigFactory.load()
   lazy val dislProgram = installationDir + "/src/main/python/disl.py"
   lazy val dislHome = config.getString("disl.home")
-  lazy val instDir = installationDir +
-    "/target/scala-2.11/classes"
+  lazy val instDir = installationDir + "/target/scala-2.11/classes"
   lazy val instProgram = instDir + "/com/liyaos/metabenchmark/instrumentation/Instrumentation.class"
   lazy val installationDir = new File(System.getProperty("user.dir")).getAbsolutePath
 }

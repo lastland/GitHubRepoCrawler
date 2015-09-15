@@ -5,7 +5,7 @@
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
-import com.liyaos.metabenchmark.disl.{DiSLMvn, DiSLJava}
+import com.liyaos.metabenchmark.disl.{DiSLRun, DiSLMvn, DiSLJava}
 import com.typesafe.scalalogging.StrictLogging
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -44,6 +44,7 @@ object Main extends App with StrictLogging {
     case "filter" :: Nil =>
       val result = new ConcurrentHashMap[GitHubRepo, Unit]()
       new File("./tmp/").mkdir
+      val disl = new DiSLRun
       GitHubRepoDatabase.DB.withDynSession {
         for (repo <- gitHubRepos) {
           val r = repo.toGitHubRepo
@@ -63,8 +64,11 @@ object Main extends App with StrictLogging {
             case r: GitHubRepo =>
               val download = new GitHubDownloader(r)
               val tester = new MavenRepoTester(download.downloadTo("./tmp/").path, Some(DiSLMvn.dir))
-              val exitCode = tester.test()
-              println(s"Test results for $r: $exitCode")
+              disl.run {
+                logger.info(s"Testing $r")
+                val exitCode = tester.test()
+                logger.info(s"Test results for $r: $exitCode")
+              }
           }
         }
       }

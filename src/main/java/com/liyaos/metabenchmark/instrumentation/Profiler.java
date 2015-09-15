@@ -4,14 +4,9 @@ package com.liyaos.metabenchmark.instrumentation;
  * Created by lastland on 15/9/10.
  */
 import java.util.LinkedList;
-import java.util.Map.Entry;
-import java.util.OptionalDouble;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
         import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import com.liyaos.metabenchmark.profiler.ArchiveDumper;
 import com.liyaos.metabenchmark.profiler.Dumper;
@@ -138,7 +133,7 @@ public class Profiler {
     }
 
     public static void dump() {
-        try (Dumper dumper = new ArchiveDumper("results")) {
+        try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName())) {
             runnings(dumper);
         }
     }

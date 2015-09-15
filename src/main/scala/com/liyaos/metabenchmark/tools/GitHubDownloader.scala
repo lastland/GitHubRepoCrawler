@@ -8,7 +8,8 @@ import scala.sys.process._
 
 class GitHubDownloader(repo: GitHubRepo) {
   def downloadTo(path: String): LocalGitHubRepo = {
-    Process(Seq("git", "clone", repo.link), new File(path)).!
+    if (!new File(path + repo.name).exists())
+      Process(Seq("git", "clone", repo.link), new File(path)).!
     val build  = Build.createBuild(repo)
     build match {
       case m: MavenBuild =>
