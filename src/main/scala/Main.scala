@@ -45,6 +45,7 @@ object Main extends App with StrictLogging {
       val result = new ConcurrentHashMap[GitHubRepo, Unit]()
       new File("./tmp/").mkdir
       val disl = new DiSLRun
+      disl.setup()
       GitHubRepoDatabase.DB.withDynSession {
         for (repo <- gitHubRepos) {
           val r = repo.toGitHubRepo
@@ -55,19 +56,32 @@ object Main extends App with StrictLogging {
               val flag = detector.imports exists { im =>
                 im.contains("java.util.concurrent.ThreadPoolExecutor")
               }
-              if (flag) r else throw new RuntimeException("does not contain target imports")
+              if (flag) {
+                logger.info(s"Found $r")
+                r
+              } else {
+                logger.info(s"$r does not contain target imports")
+                throw new RuntimeException("does not contain target imports")
+              }
             } else {
               throw new RuntimeException("does not get through qualifications")
             }
           }
           f onSuccess {
-            case r: GitHubRepo =>
-              val download = new GitHubDownloader(r)
-              val tester = new MavenRepoTester(download.downloadTo("./tmp/").path, Some(DiSLMvn.dir))
-              disl.run {
-                logger.info(s"Testing $r")
-                val exitCode = tester.test()
-                logger.info(s"Test results for $r: $exitCode")
+            case r =>
+              try {
+                logger.info(s"Downloading $r")
+                val download = new GitHubDownloader(r)
+                val tester = new MavenRepoTester(download.downloadTo("./tmp/").path, Some(DiSLMvn.dir))
+                logger.info(s"$r download complete")
+                logger.debug(s"disl failed = ${disl.failed}, disl started = ${disl.serverStarted}")
+                disl.run {
+                  logger.info(s"Testing $r")
+                  val exitCode = tester.test()
+                  logger.info(s"Test results for $r: $exitCode")
+                }
+              } catch {
+                case e => logger.info(s"Exception on $r: $e")
               }
           }
         }
