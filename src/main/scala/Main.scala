@@ -45,7 +45,6 @@ object Main extends App with StrictLogging {
       val result = new ConcurrentHashMap[GitHubRepo, Unit]()
       new File("./tmp/").mkdir
       val disl = new DiSLRun
-      disl.setup()
       GitHubRepoDatabase.DB.withDynSession {
         for (repo <- gitHubRepos) {
           val r = repo.toGitHubRepo
