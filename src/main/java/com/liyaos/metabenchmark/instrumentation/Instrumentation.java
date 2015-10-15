@@ -11,6 +11,7 @@ import ch.usi.dag.disl.marker.BodyMarker;
 
 public class Instrumentation {
 
+    /*
     @Before(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.beforeExecute")
     public static void test(DynamicContext dc) {
         Profiler.poolBegin(dc.getMethodArgumentValue(0, Thread.class),
@@ -20,5 +21,16 @@ public class Instrumentation {
     @After(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.afterExecute")
     public static void end(DynamicContext dc) {
         Profiler.poolEnd(dc.getMethodArgumentValue(0, Runnable.class));
+    }
+    */
+
+    //@After(marker = BodyMarker.class, scope = "org.apache.commons.collections4.bag.HashBag.getCount")
+    @After(marker = BodyMarker.class, scope = "com.liyaos.concurrent.factorial.*.*")
+    public static void allOfthem(DynamicContext dc) {
+        Object m = dc.getThis();
+        if (m != null) {
+            System.out.println("instrumented:" + m);
+            Profiler.log(m);
+        }
     }
 }

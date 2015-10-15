@@ -3,10 +3,11 @@ package com.liyaos.metabenchmark.instrumentation;
 /**
  * Created by lastland on 15/9/10.
  */
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
-        import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.liyaos.metabenchmark.profiler.ArchiveDumper;
 import com.liyaos.metabenchmark.profiler.Dumper;
@@ -97,14 +98,18 @@ public class Profiler {
     public static final long MS = 1000000;
     public static final long STRIDE = 100 * MS;
 
-    public static ConcurrentHashMap<Object, ConcurrentLinkedDeque<RunningState>> runnings;
+    public static ConcurrentHashMap<Runnable, ConcurrentLinkedDeque<RunningState>> runnings;
 
     public static ConcurrentHashMap<Object, Integer> count;
+
+    public static ConcurrentHashMap<Object, Integer> objCount;
 
     static {
         runnings = new ConcurrentHashMap<>();
 
         count = new ConcurrentHashMap<>();
+
+        objCount = new ConcurrentHashMap<>();
 
         Runtime.getRuntime().addShutdownHook(new Thread(Profiler::dump));
     }
@@ -135,15 +140,19 @@ public class Profiler {
     public static void dump() {
         try {
             try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName())) {
-                runnings(dumper);
-                //dumper.println("----");
-                //objCount.entrySet().forEach(r -> dumper.println(r.getKey() + " : " + r.getValue()));
-                //dumper.println("----");
-                //dumper.println("1");
+                //runnings(dumper);
+                dumper.println("----");
+                objCount.entrySet().forEach(r -> dumper.println(r.getKey() + " : " + r.getValue()));
+                dumper.println("----");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void log(Object ob) {
+        objCount.computeIfPresent(ob, (k, v) -> v + 1);
+        objCount.computeIfAbsent(ob, k -> 1);
     }
 
     private static int getStride() {
@@ -158,11 +167,11 @@ public class Profiler {
         return System.nanoTime() - START;
     }
 
-    public static void poolBegin(Thread t, Object r) {
+    public static void poolBegin(Thread t, Runnable r) {
         runnings.computeIfAbsent(r, k -> new ConcurrentLinkedDeque<>()).addLast(new RunningState(t));
     }
 
-    public static void poolEnd(Object r) {
+    public static void poolEnd(Runnable r) {
         runnings.get(r).peekLast().end();
     }
 
