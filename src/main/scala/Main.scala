@@ -7,12 +7,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 import com.liyaos.metabenchmark.disl.{DiSLRun, DiSLMvn, DiSLJava}
 import com.typesafe.scalalogging.StrictLogging
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.slick.driver.H2Driver.simple._
 import Database.dynamicSession
 import scala.slick.jdbc.StaticQuery._
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import com.liyaos.metabenchmark.database.{GitHubRepoDatabase, Tables}
 import com.liyaos.metabenchmark.tools._
 import Tables._
@@ -48,40 +46,17 @@ object Main extends App with StrictLogging {
       GitHubRepoDatabase.DB.withDynSession {
         for (repo <- gitHubRepos) {
           val r = repo.toGitHubRepo
-          val f = Future {
-            if (r.commitNum >= 100 && r.releaseNum >= 5 && r.branchNum > 1) {
-              logger.info(s"trying $r")
-              val detector = new GitHubRepoImportDetector(r.owner + "/" + r.name)
-              val flag = detector.imports exists { im =>
-                im.contains("java.util.concurrent.ThreadPoolExecutor")
-              }
-              if (flag) {
-                logger.info(s"Found $r")
-                r
-              } else {
-                logger.info(s"$r does not contain target imports")
-                throw new RuntimeException("does not contain target imports")
-              }
-            } else {
-              throw new RuntimeException("does not get through qualifications")
-            }
-          }
-          f onSuccess {
-            case r =>
-              try {
-                logger.info(s"Downloading $r")
-                val download = new GitHubDownloader(r)
-                val tester = new MavenRepoTester(download.downloadTo("./tmp/").path, Some(DiSLMvn.dir))
-                logger.info(s"$r download complete")
-                logger.debug(s"disl failed = ${disl.failed}, disl started = ${disl.serverStarted}")
-                disl.run {
-                  logger.info(s"Testing $r")
-                  val exitCode = tester.test()
-                  logger.info(s"Test results for $r: $exitCode")
-                }
-              } catch {
-                case e => logger.info(s"Exception on $r: $e")
-              }
+          val f = GitHubRepoTestRunner.run(disl, r)
+          f onFailure {
+            case e: NoRecognizableBuildException =>
+              logger.debug(s"${r} with no recognizable build.")
+            case FilterOutException(phase) =>
+              logger.debug(s"${r} filtered out at ${phase}.")
+            case DownloadFailedException(f) =>
+              logger.debug(s"${r} download failed at ${f}.")
+            case e: Throwable => logger.info(
+              s"""${r}: ${e}
+           | ${e.getStackTrace.mkString("\n")}""".stripMargin)
           }
         }
       }

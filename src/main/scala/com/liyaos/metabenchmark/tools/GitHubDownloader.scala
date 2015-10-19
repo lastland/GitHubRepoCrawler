@@ -6,14 +6,30 @@ package com.liyaos.metabenchmark.tools
 import java.io.File
 import scala.sys.process._
 
+case class DownloadFailedException(file: String) extends Exception
+
 class GitHubDownloader(repo: GitHubRepo) {
+
+  var currentPath: Option[String] = None
+
   def downloadTo(path: String): LocalGitHubRepo = {
-    if (!new File(path + repo.name).exists())
+    val target = path + "/" + repo.name
+    val c = if (!(new File(target).exists())) {
       Process(Seq("git", "clone", repo.link), new File(path)).!
-    val build  = Build.createBuild(repo)
+    } else 0
+    if (c != 0) throw DownloadFailedException(target)
+    currentPath = Some(path)
+    val build  = Build.createBuild(target)
     build match {
       case m: MavenBuild =>
-        new LocalGitHubMavenRepo(path + "/" + repo.name)
+        new LocalGitHubMavenRepo(target)
+    }
+  }
+
+  def delete() {
+    currentPath match {
+      case Some(p) => new File(p).delete()
+      case None => ()
     }
   }
 }

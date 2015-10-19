@@ -140,10 +140,10 @@ public class Profiler {
     public static void dump() {
         try {
             try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName())) {
-                //runnings(dumper);
-                dumper.println("----");
-                objCount.entrySet().forEach(r -> dumper.println(r.getKey() + " : " + r.getValue()));
-                dumper.println("----");
+                runnings(dumper);
+                //dumper.println("----");
+                //objCount.entrySet().forEach(r -> dumper.println(r.getKey() + " : " + r.getValue()));
+                //dumper.println("----");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

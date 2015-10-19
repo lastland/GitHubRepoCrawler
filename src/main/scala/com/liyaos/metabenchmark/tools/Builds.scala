@@ -4,12 +4,10 @@ package com.liyaos.metabenchmark.tools
  * Created by lastland on 15/6/22.
  */
 
-import net.ruippeixotog.scalascraper.browser.Browser
-import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
-import net.ruippeixotog.scalascraper.dsl.DSL._
-
 import scala.io.Source
 import scala.xml.{Elem, XML}
+import better.files._
+import better.files.Cmds.ls
 
 class NoRecognizableBuildException extends Exception
 class PomEmptyException extends Exception
@@ -19,23 +17,17 @@ abstract class Build {
 }
 
 object Build {
-  def createBuild(repo: GitHubRepo): Build = {
-    val browser = new Browser
-    val page = browser.get(repo.link)
-    val branch = (page >> element("span.select-menu-button")).attr("title")
-    val files = (page >> element("table.files") >> elements("td.content")).map(_ >?> text("a"))
-    val builds = for {
-      f <- files
-      file <- f if file == "pom.xml" || file == "build.sbt"
-    } yield file
+  def createBuild(path: String): Build = {
+    val files = ls(File(path)).toList
+    val builds = files.filter(_.name == "pom.xml").toList
     if (!builds.isEmpty) {
-      builds(0) match {
+      val f = builds(0)
+      f.name match {
         case "pom.xml" =>
-          val pomLink = s"https://raw.githubusercontent.com/${repo.owner}/${repo.name}/${branch}/pom.xml"
-          val content = Source.fromURL(pomLink).mkString.trim
+          val content = f.lines.mkString("\n").trim
           if (content.size > 0) {
             val pom = XML.loadString(content)
-            new MavenBuild(repo, pom)
+            new MavenBuild(path, pom)
           } else {
             throw new PomEmptyException
           }
@@ -48,7 +40,7 @@ object Build {
   }
 }
 
-class MavenBuild(repo: GitHubRepo, pom: Elem) extends Build {
+class MavenBuild(path: String, pom: Elem) extends Build {
   override def dependencies = {
     (pom \\ "dependency").flatMap { d =>
       (d \ "artifactId").map(_.text)

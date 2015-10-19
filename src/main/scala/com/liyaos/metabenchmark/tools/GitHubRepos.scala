@@ -21,11 +21,11 @@ object GitHubRepo {
 case class GitHubRepo(owner: String, name: String) {
   def link = s"https://github.com/$owner/$name"
   lazy val doc = PageGetter.get(link)
-  lazy val numbersSummary = {
+  lazy val numbersSummary: Seq[Int] = {
     doc match {
       case Success(page) =>
         (page >> element("ul.numbers-summary") >> elements("span.num")).map(
-          _ >> text("span")).map(_.replace(",", "").toInt)
+          _ >> text("span")).map(_.replace(",", "")).take(3).map(_.trim.toInt).toList
       case Failure(exception) =>
         throw exception
     }
@@ -33,7 +33,8 @@ case class GitHubRepo(owner: String, name: String) {
   lazy val commitNum: Int = numbersSummary(0)
   lazy val branchNum: Int = numbersSummary(1)
   lazy val releaseNum: Int = numbersSummary(2)
-  lazy val contributorNum: Int = numbersSummary(3)
+  // contributor number is unknow because of ajax
+  //lazy val contributorNum: Int = numbersSummary(3)
 
   def toRow: Tables.GitHubRepoRow = Tables.GitHubRepoRow(None, owner, name)
 
