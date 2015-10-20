@@ -4,6 +4,7 @@ package com.liyaos.metabenchmark.tools
  * Created by lastland on 15/7/23.
  */
 import java.io.File
+import ammonite.ops.{rm, Path}
 import scala.sys.process._
 
 case class DownloadFailedException(file: String) extends Exception
@@ -18,7 +19,7 @@ class GitHubDownloader(repo: GitHubRepo) {
       Process(Seq("git", "clone", repo.link), new File(path)).!
     } else 0
     if (c != 0) throw DownloadFailedException(target)
-    currentPath = Some(path)
+    currentPath = Some(new File(path).getAbsolutePath)
     val build  = Build.createBuild(target)
     build match {
       case m: MavenBuild =>
@@ -28,7 +29,7 @@ class GitHubDownloader(repo: GitHubRepo) {
 
   def delete() {
     currentPath match {
-      case Some(p) => new File(p).delete()
+      case Some(p) => rm(Path(p))
       case None => ()
     }
   }

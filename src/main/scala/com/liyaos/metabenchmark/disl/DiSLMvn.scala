@@ -11,8 +11,8 @@ object DiSLMvn extends ScriptInstaller {
   def content =
     s"""|#!/bin/bash
         |export PATH="${DiSLConfig.installationDir}:$$PATH"
-        |export JAVA_HOME="$${JAVA_HOME:-$$(/usr/libexec/java_home)}"
-        |export JAVACMD="${DiSLConfig.installationDir}/java"
+        |export JAVA_HOME="${DiSLJava.fakeJavaHome}"
+        |export JAVACMD="${DiSLJava.dir}"
         |exec "${"which mvn".!!.stripLineEnd}" "$$@"
      """.stripMargin
 
