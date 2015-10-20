@@ -5,9 +5,8 @@ package com.liyaos.metabenchmark.tools
  */
 
 import scala.io.Source
+import java.io.File
 import scala.xml.{Elem, XML}
-import better.files._
-import better.files.Cmds.ls
 
 class NoRecognizableBuildException extends Exception
 class PomEmptyException extends Exception
@@ -18,13 +17,12 @@ abstract class Build {
 
 object Build {
   def createBuild(path: String): Build = {
-    val files = ls(File(path)).toList
-    val builds = files.filter(_.name == "pom.xml").toList
+    val builds = new File(path).list.filter(_ == "pom.xml")
     if (!builds.isEmpty) {
-      val f = builds(0)
-      f.name match {
+      val p = builds(0)
+      p match {
         case "pom.xml" =>
-          val content = f.lines.mkString("\n").trim
+          val content = Source.fromFile(path + "/pom.xml").mkString
           if (content.size > 0) {
             val pom = XML.loadString(content)
             new MavenBuild(path, pom)

@@ -38,7 +38,7 @@ class DiSLRun {
     synchronized {
       val fu = setup()
       try {
-        Await.ready(fu, 1 second)
+        Await.ready(fu, 2 seconds)
       } finally {
         while (!serverStarted) {
           failed match {
