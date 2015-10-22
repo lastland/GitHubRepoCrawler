@@ -38,14 +38,14 @@ class DiSLRun {
     synchronized {
       val fu = setup()
       try {
-        Await.ready(fu, 2 seconds)
+        Await.ready(fu, 5 seconds)
       } finally {
         while (!serverStarted) {
           failed match {
             case Some(e) =>
               val fu = setup()
               try {
-                Await.ready(fu, 1 second)
+                Await.ready(fu, 5 second)
               } catch {
                 case e: TimeoutException => ()
               }
