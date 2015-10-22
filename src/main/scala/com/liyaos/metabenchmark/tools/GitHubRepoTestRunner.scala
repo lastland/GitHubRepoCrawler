@@ -24,22 +24,29 @@ object GitHubRepoTestRunner extends StrictLogging {
     if (r.commitNum >= 100 && r.releaseNum >= 5 && r.branchNum > 1) {
       logger.info(s"trying $r")
       val d = new GitHubDownloader(r)
-      d.downloadTo("./tmp/")
-      val imports = new LocalRepoImportDetector(Paths.get("./tmp", r.name).toAbsolutePath).imports
-      logger.debug(s"$r imports: $imports")
-      val flag = imports exists { im =>
-        im.contains("java.util.concurrent.ThreadPoolExecutor")
-      }
-      if (flag) {
-        logger.info(s"Found $r")
-        r
-      } else {
-        logger.info(s"$r does not contain target imports")
-        if (deleteFailed) {
-          logger.debug(s"deleting $r")
-          d.delete()
+      try {
+        d.downloadTo("./tmp/")
+        val imports = new LocalRepoImportDetector(Paths.get("./tmp", r.name).toAbsolutePath).imports
+        logger.debug(s"$r imports: $imports")
+        val flag = imports exists { im =>
+          im.contains("java.util.concurrent.ThreadPoolExecutor")
         }
-        throw FilterOutException(Filtering)
+        if (flag) {
+          logger.info(s"Found $r")
+          r
+        } else {
+          logger.info(s"$r does not contain target imports")
+          if (deleteFailed) {
+            logger.debug(s"deleting $r")
+            d.delete()
+          }
+          throw FilterOutException(Filtering)
+        }
+      } catch {
+        case e: NoRecognizableBuildException =>
+          d.delete()
+          throw e
+        case e: Throwable => throw e
       }
     } else {
       throw FilterOutException(Qualification)
