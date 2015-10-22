@@ -3,11 +3,13 @@ package com.liyaos.metabenchmark.instrumentation;
 /**
  * Created by lastland on 15/9/10.
  */
-import com.liyaos.metabenchmark.instrumentation.Profiler;
 import ch.usi.dag.disl.annotation.After;
+import ch.usi.dag.disl.annotation.AfterReturning;
 import ch.usi.dag.disl.annotation.Before;
-import ch.usi.dag.disl.dynamiccontext.DynamicContext;
+import ch.usi.dag.disl.annotation.SyntheticLocal;
 import ch.usi.dag.disl.marker.BodyMarker;
+import ch.usi.dag.disl.staticcontext.MethodStaticContext;
+import ch.usi.dag.disl.dynamiccontext.DynamicContext;
 
 public class Instrumentation {
 
@@ -21,6 +23,33 @@ public class Instrumentation {
     public static void end(DynamicContext dc) {
         Profiler.poolEnd(dc.getMethodArgumentValue(0, Runnable.class));
     }
+
+    @SyntheticLocal
+    static long start;
+
+    @Before(marker = BodyMarker.class, guard = GuardUnitTest.class)
+    static void onMethodEntry() {
+        start = System.nanoTime();
+    }
+
+    @After(marker = BodyMarker.class, guard = GuardUnitTest.class)
+    static void onMethodExit(MethodStaticContext msc) {
+        System.out.print(msc.thisMethodFullName() + " " + (System.nanoTime() - start));
+    }
+
+//	@AfterReturning(marker = BytecodeMarker.class, args = "new", order = 0)
+//	static void profileActualAllocation(EnhancedBytecodeStaticContext context) {
+//		GraalDirectives.instrumentationBegin(-1);
+//		Profiler.profileAllocation(context.bci(), GraalDirectives.runtimePath());
+//		GraalDirectives.instrumentationEnd();
+//	}
+//
+//	@AfterReturning(marker = BytecodeMarker.class, args = "new", order = 1)
+//	static void profileAllocation(EnhancedBytecodeStaticContext context) {
+//		GraalDirectives.instrumentationBegin(0);
+//		Profiler.profileAllocation(context.bci(), 2);
+//		GraalDirectives.instrumentationEnd();
+//	}
 
     /*
     //@After(marker = BodyMarker.class, scope = "org.apache.commons.collections4.bag.HashBag.getCount")
