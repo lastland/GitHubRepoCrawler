@@ -47,7 +47,9 @@ case class LocalRepoJavaImportDetector(path: Path) extends LocalImportDetector(p
 
   override def imports: Set[String] = {
     Source.fromFile(path.toFile).getLines().filter(_.trim.startsWith("import ")).map { line =>
-      line.trim.substring(line.indexOfSlice("import ") + 7, line.size - 1)
+      line.trim
+    }.map { line =>
+      line.substring(line.indexOfSlice("import ") + 7, line.size - 1)
     }.map { line =>
       if (line.contains("static "))
         line.trim.substring(line.indexOfSlice("static") + 7)

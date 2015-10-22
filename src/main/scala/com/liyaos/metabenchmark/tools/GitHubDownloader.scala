@@ -19,7 +19,7 @@ class GitHubDownloader(repo: GitHubRepo) {
       Process(Seq("git", "clone", repo.link), new File(path)).!
     } else 0
     if (c != 0) throw DownloadFailedException(target)
-    currentPath = Some(new File(path).getAbsolutePath)
+    currentPath = Some(new File(target).getAbsolutePath)
     val build  = Build.createBuild(target)
     build match {
       case m: MavenBuild =>
