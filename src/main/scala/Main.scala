@@ -46,7 +46,7 @@ object Main extends App with StrictLogging {
       GitHubRepoDatabase.DB.withDynSession {
         for (repo <- gitHubRepos) {
           val r = repo.toGitHubRepo
-          val f = GitHubRepoTestRunner.run(disl, r)
+          val f = GitHubRepoTestRunner.run(disl, r, "java.util.concurrent.ThreadPoolExecutor")
           f onFailure {
             case e: NoRecognizableBuildException =>
               logger.debug(s"${r} with no recognizable build.")
