@@ -1,5 +1,7 @@
 # GitHubRepo Miner
 
+[![Join the chat at https://gitter.im/lastland/GitHubRepoCrawler](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/lastland/GitHubRepoCrawler?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Prerequisite
 
 [DiSL](http://disl.projects.ow2.org/), Java (JDK 8 is preferred), Mvn, [sbt](http://scala-sbt.org/)
