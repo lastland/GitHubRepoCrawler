@@ -25,8 +25,8 @@ object GitHubRepoTestRunner extends StrictLogging {
       logger.info(s"trying $r")
       val d = new GitHubDownloader(r)
       try {
-        d.downloadTo("./tmp/")
-        val imports = new LocalRepoImportDetector(Paths.get("./tmp", r.name).toAbsolutePath).imports
+        d.downloadTo("./threadpool/")
+        val imports = new LocalRepoImportDetector(Paths.get("./threadpool", r.name).toAbsolutePath).imports
         logger.debug(s"$r imports: $imports")
         val flag = imports exists { im =>
           im.contains(matchImport)
