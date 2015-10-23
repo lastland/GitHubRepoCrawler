@@ -41,12 +41,12 @@ object Main extends App with StrictLogging {
       }
     case "filter" :: Nil =>
       val result = new ConcurrentHashMap[GitHubRepo, Unit]()
-      new File("./tmp/").mkdir
+      new File("./actors/").mkdir
       val disl = new DiSLRun
       GitHubRepoDatabase.DB.withDynSession {
         for (repo <- gitHubRepos) {
           val r = repo.toGitHubRepo
-          val f = GitHubRepoTestRunner.run(disl, r, "java.util.concurrent.ThreadPoolExecutor")
+          val f = GitHubRepoTestRunner.run(disl, r, "scala.actors.Actor")
           f onFailure {
             case e: NoRecognizableBuildException =>
               logger.debug(s"${r} with no recognizable build.")
