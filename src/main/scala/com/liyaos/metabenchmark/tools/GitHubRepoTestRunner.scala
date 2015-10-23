@@ -2,6 +2,7 @@ package com.liyaos.metabenchmark.tools
 
 import java.nio.file.{Paths, Path}
 
+import com.liyaos.metabenchmark.MainArguments
 import com.liyaos.metabenchmark.disl.{DiSLMvn, DiSLRun}
 import com.typesafe.scalalogging.StrictLogging
 import scala.concurrent.Future
@@ -25,8 +26,8 @@ object GitHubRepoTestRunner extends StrictLogging {
       logger.info(s"trying $r")
       val d = new GitHubDownloader(r)
       try {
-        d.downloadTo("./threadpool/")
-        val imports = new LocalRepoImportDetector(Paths.get("./threadpool", r.name).toAbsolutePath).imports
+        d.downloadTo(MainArguments.outputFolder)
+        val imports = new LocalRepoImportDetector(Paths.get(MainArguments.outputFolder, r.name).toAbsolutePath).imports
         logger.debug(s"$r imports: $imports")
         val flag = imports exists { im =>
           im.contains(matchImport)
@@ -54,7 +55,7 @@ object GitHubRepoTestRunner extends StrictLogging {
   } map { r =>
     try {
       val download = new GitHubDownloader(r)
-      val tester = new MavenRepoTester(download.downloadTo("./threadpool/").path, Some(DiSLMvn.dir))
+      val tester = new MavenRepoTester(download.downloadTo(MainArguments.outputFolder).path, Some(DiSLMvn.dir))
       disl.run {
         val exitCode = tester.test()
         logger.info(s"Test results for $r: $exitCode")

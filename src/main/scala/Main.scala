@@ -5,6 +5,7 @@
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
+import com.liyaos.metabenchmark.MainArguments
 import com.liyaos.metabenchmark.disl.{DiSLRun, DiSLMvn, DiSLJava}
 import com.typesafe.scalalogging.StrictLogging
 import scala.slick.driver.H2Driver.simple._
@@ -41,7 +42,7 @@ object Main extends App with StrictLogging {
       }
     case "filter" :: Nil =>
       val result = new ConcurrentHashMap[GitHubRepo, Unit]()
-      new File("./threadpool/").mkdir
+      new File(MainArguments.outputFolder).mkdir
       val disl = new DiSLRun
       GitHubRepoDatabase.DB.withDynSession {
         for (repo <- gitHubRepos) {
