@@ -20,13 +20,15 @@ import Phase._
 case class FilterOutException(phase: Phase) extends Exception
 
 object GitHubRepoTestRunner extends StrictLogging {
-  def run(disl: DiSLRun, r: GitHubRepo, matchImport: String, deleteFailed: Boolean = true) = Future {
+  def run(disl: DiSLRun, r: GitHubRepo, matchImport: String,
+          downloadDir: String = "./tmp/", deleteFailed: Boolean = true) = Future {
     if (r.commitNum >= 100 && r.releaseNum >= 5 && r.branchNum > 1) {
       logger.info(s"trying $r")
       val d = new GitHubDownloader(r)
       try {
-        d.downloadTo("./tmp/")
-        val imports = new LocalRepoImportDetector(Paths.get("./tmp", r.name).toAbsolutePath).imports
+        d.downloadTo(downloadDir)
+        val imports = new LocalRepoImportDetector(
+          Paths.get(downloadDir, r.name).toAbsolutePath).imports
         logger.debug(s"$r imports: $imports")
         val flag = imports exists { im =>
           im.contains(matchImport)
@@ -54,7 +56,7 @@ object GitHubRepoTestRunner extends StrictLogging {
   } map { r =>
     try {
       val download = new GitHubDownloader(r)
-      val tester = download.downloadTo("./tmp/").getTester()
+      val tester = download.downloadTo(downloadDir).getTester()
       disl.run {
         val exitCode = tester.test()
         logger.info(s"Test results for $r: $exitCode")
