@@ -11,30 +11,37 @@ import ch.usi.dag.disl.marker.BodyMarker;
 import ch.usi.dag.disl.staticcontext.MethodStaticContext;
 import ch.usi.dag.disl.dynamiccontext.DynamicContext;
 
+import java.util.Objects;
+
 public class Instrumentation {
 
-    @Before(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.beforeExecute")
-    public static void test(DynamicContext dc) {
-        Profiler.poolBegin(dc.getMethodArgumentValue(0, Thread.class),
-                dc.getMethodArgumentValue(1, Runnable.class));
-    }
+//    @Before(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.beforeExecute")
+//    public static void test(DynamicContext dc) {
+//        Profiler.poolBegin(dc.getMethodArgumentValue(0, Thread.class),
+//                dc.getMethodArgumentValue(1, Runnable.class));
+//    }
+//
+//    @After(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.afterExecute")
+//    public static void end(DynamicContext dc) {
+//        Profiler.poolEnd(dc.getMethodArgumentValue(0, Runnable.class));
+//    }
+//
+//    @SyntheticLocal
+//    static long start;
+//
+//    @Before(marker = BodyMarker.class, guard = GuardUnitTest.class)
+//    static void onMethodEntry() {
+//        start = System.nanoTime();
+//    }
+//
+//    @After(marker = BodyMarker.class, guard = GuardUnitTest.class)
+//    static void onMethodExit(MethodStaticContext msc) {
+//        System.out.print(msc.thisMethodFullName() + " " + (System.nanoTime() - start));
+//    }
 
-    @After(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.afterExecute")
-    public static void end(DynamicContext dc) {
-        Profiler.poolEnd(dc.getMethodArgumentValue(0, Runnable.class));
-    }
-
-    @SyntheticLocal
-    static long start;
-
-    @Before(marker = BodyMarker.class, guard = GuardUnitTest.class)
-    static void onMethodEntry() {
-        start = System.nanoTime();
-    }
-
-    @After(marker = BodyMarker.class, guard = GuardUnitTest.class)
-    static void onMethodExit(MethodStaticContext msc) {
-        System.out.print(msc.thisMethodFullName() + " " + (System.nanoTime() - start));
+    @After(marker = BodyMarker.class, scope = "scala.concurrent.Future.apply")
+    public static void tellIt(DynamicContext dc) {
+        Profiler.log(dc.getMethodArgumentValue(0, Objects.class));
     }
 
 //	@AfterReturning(marker = BytecodeMarker.class, args = "new", order = 0)
