@@ -54,7 +54,7 @@ object GitHubRepoTestRunner extends StrictLogging {
   } map { r =>
     try {
       val download = new GitHubDownloader(r)
-      val tester = new MavenRepoTester(download.downloadTo("./tmp/").path, Some(DiSLMvn.dir))
+      val tester = download.downloadTo("./tmp/").getTester()
       disl.run {
         val exitCode = tester.test()
         logger.info(s"Test results for $r: $exitCode")

@@ -5,6 +5,7 @@ package com.liyaos.metabenchmark.tools
  */
 import java.io.File
 import ammonite.ops.{rm, Path}
+import com.liyaos.metabenchmark.disl.{DiSLSbt, DiSLMvn}
 import scala.sys.process._
 
 case class DownloadFailedException(file: String) extends Exception
@@ -24,6 +25,8 @@ class GitHubDownloader(repo: GitHubRepo) {
     build match {
       case m: MavenBuild =>
         new LocalGitHubMavenRepo(target)
+      case s: SbtBuild =>
+        new LocalGitHubSbtRepo(target)
     }
   }
 
@@ -41,6 +44,12 @@ abstract class LocalGitHubRepo(val path: String) {
 
 class LocalGitHubMavenRepo(override val path: String) extends LocalGitHubRepo(path) {
   def getTester(): RepoTester = {
-    new MavenRepoTester(path)
+    new MavenRepoTester(path, Some(DiSLMvn.dir))
+  }
+}
+
+class LocalGitHubSbtRepo(override val path: String) extends LocalGitHubRepo(path) {
+  override def getTester(): RepoTester = {
+    new SbtRepoTester(path, Some(DiSLSbt.dir))
   }
 }

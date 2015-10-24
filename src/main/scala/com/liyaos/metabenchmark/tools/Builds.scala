@@ -16,22 +16,27 @@ abstract class Build {
 }
 
 object Build {
-  def createBuild(path: String): Build = {
-    val builds = new File(path).list.filter(_ == "pom.xml")
-    if (!builds.isEmpty) {
-      val p = builds(0)
-      p match {
-        case "pom.xml" =>
-          val content = Source.fromFile(path + "/pom.xml").mkString
-          if (content.size > 0) {
-            val pom = XML.loadString(content)
-            new MavenBuild(path, pom)
-          } else {
-            throw new PomEmptyException
-          }
-        case _ =>
-          throw new NoRecognizableBuildException
+  val matches: Map[String, (String) => Build] = Map(
+    "pom.xml" -> ((path: String) => {
+      val content = Source.fromFile(path + "/pom.xml").mkString
+      if (content.size > 0) {
+        val pom = XML.loadString(content)
+        new MavenBuild(path, pom)
+      } else {
+        throw new PomEmptyException
       }
+    }),
+    "build.sbt" -> ((path: String) => {
+      new SbtBuild(path, new File(path + "/build.sbt"))
+    }))
+  val list = matches.keys
+
+  def createBuild(path: String): Build = {
+    val builds = new File(path).list.filter { f =>
+      list.exists(f == _)
+    }
+    if (!builds.isEmpty) {
+      matches(builds(0))(path)
     } else {
       throw new NoRecognizableBuildException
     }
@@ -44,4 +49,9 @@ class MavenBuild(path: String, pom: Elem) extends Build {
       (d \ "artifactId").map(_.text)
     }.toStream
   }
+}
+
+class SbtBuild(path: String, file: File) extends Build {
+  // No need to implement this method for now
+  override def dependencies: Stream[String] = ???
 }

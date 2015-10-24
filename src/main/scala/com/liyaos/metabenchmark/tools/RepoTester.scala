@@ -19,3 +19,13 @@ class MavenRepoTester(path: String, mvn: Option[String] = None) extends RepoTest
     Process(Seq(mvnProgram, "test"), new File(path)).!
   }
 }
+
+class SbtRepoTester(path: String, sbt: Option[String] = None) extends RepoTester(path) {
+  override def test() = {
+    val sbtProgram = sbt match {
+      case None => "sbt"
+      case Some(s) => s
+    }
+    Process(Seq(sbtProgram, "test"), new File(path)).!
+  }
+}

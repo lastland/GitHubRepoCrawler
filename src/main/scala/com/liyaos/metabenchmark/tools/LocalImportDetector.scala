@@ -76,7 +76,7 @@ trait ScalaBasics {
 }
 
 object ScalaImportParser extends ScalaBasics {
-  val White = fastparse.WhitespaceApi.Wrapper{
+  val White = fastparse.WhitespaceApi.Wrapper {
     import fastparse.all._
     NoTrace(" ".rep)
   }

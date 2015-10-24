@@ -5,7 +5,7 @@
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
-import com.liyaos.metabenchmark.disl.{DiSLRun, DiSLMvn, DiSLJava}
+import com.liyaos.metabenchmark.disl.{DiSLSbt, DiSLRun, DiSLMvn, DiSLJava}
 import com.typesafe.scalalogging.StrictLogging
 import scala.slick.driver.H2Driver.simple._
 import Database.dynamicSession
@@ -26,6 +26,7 @@ object Main extends App with StrictLogging {
         case e => println(e)
       }
       DiSLJava.install()
+      DiSLSbt.install()
       DiSLMvn.install()
     case "reset" :: Nil =>
       GitHubRepoDatabase.DB.withDynSession {
