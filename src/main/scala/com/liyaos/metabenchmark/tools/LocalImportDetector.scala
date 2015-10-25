@@ -77,7 +77,6 @@ trait ScalaBasics {
 
 object ScalaImportParser extends ScalaBasics {
   val White = fastparse.WhitespaceApi.Wrapper {
-    import fastparse.all._
     NoTrace(" ".rep)
   }
   import White._
@@ -86,9 +85,9 @@ object ScalaImportParser extends ScalaBasics {
     x._2.map(y => pre + y)
   })
   val packageExpr: P[String] = P((word ~ ".").!)
-  val nameExpr: P[String] = P(word.! ~ "=>" ~ word | word.!)
+  val nameExpr: P[String] = P(word.! ~ "=>" ~ word | word.! | "_".!)
   val namesExpr: P[Seq[String]] = P("{" ~ nameExpr.rep(1, sep = ",") ~ "}")
-  val objExpr: P[Seq[String]] = P(word.!.map(Seq(_)) | namesExpr)
+  val objExpr: P[Seq[String]] = P(word.!.map(Seq(_)) | "_".!.map(Seq(_)) | namesExpr)
 
   val importExpr: P[Seq[String]] = P("import" ~! libExpr )
 }
