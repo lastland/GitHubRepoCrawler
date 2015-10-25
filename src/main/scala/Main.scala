@@ -5,6 +5,7 @@
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
+import com.liyaos.metabenchmark.MainArguments
 import com.liyaos.metabenchmark.disl.{DiSLSbt, DiSLRun, DiSLMvn, DiSLJava}
 import com.typesafe.scalalogging.StrictLogging
 import scala.slick.driver.H2Driver.simple._
@@ -48,7 +49,7 @@ object Main extends App with StrictLogging {
       GitHubRepoDatabase.DB.withDynSession {
         for (repo <- gitHubRepos) {
           val r = repo.toGitHubRepo
-          val f = GitHubRepoTestRunner.run(disl, r, "java.util.concurrent.ThreadPoolExecutor",
+          val f = GitHubRepoTestRunner.run(disl, r, MainArguments.classToFilter,
             downloadDir = dir)
           f onFailure {
             case e: NoRecognizableBuildException =>
