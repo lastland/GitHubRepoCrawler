@@ -28,12 +28,13 @@ public class Instrumentation {
     static long start;
 
     @Before(marker = BodyMarker.class, guard = GuardUnitTest.class)
-    static void onMethodEntry() {
-        start = System.nanoTime();
+    static void onMethodEntry(MethodStaticContext msc) {
+        Profiler.startTimer(msc.thisMethodFullName());
     }
 
     @After(marker = BodyMarker.class, guard = GuardUnitTest.class)
     static void onMethodExit(MethodStaticContext msc) {
+        Profiler.endTimer(msc.thisMethodFullName());
         System.out.print(msc.thisMethodFullName() + " " + (System.nanoTime() - start));
     }
 
