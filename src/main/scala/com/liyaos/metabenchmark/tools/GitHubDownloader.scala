@@ -20,20 +20,27 @@ class GitHubDownloader(repo: GitHubRepo) {
       Process(Seq("git", "clone", repo.link), new File(path)).!
     } else 0
     if (c != 0) throw DownloadFailedException(target)
-    currentPath = Some(new File(target).getAbsolutePath)
-    val build  = Build.createBuild(target)
-    build match {
-      case m: MavenBuild =>
-        new LocalGitHubMavenRepo(target)
-      case s: SbtBuild =>
-        new LocalGitHubSbtRepo(target)
-    }
+    val t = new File(target).getAbsolutePath
+    currentPath = Some(t)
+    LocalGitHubRepo.getRepo(t)
   }
 
   def delete() {
     currentPath match {
       case Some(p) => rm(Path(p))
       case None => ()
+    }
+  }
+}
+
+object LocalGitHubRepo {
+  def getRepo(path: String): LocalGitHubRepo = {
+    val build  = Build.createBuild(path)
+    build match {
+      case m: MavenBuild =>
+        new LocalGitHubMavenRepo(path)
+      case s: SbtBuild =>
+        new LocalGitHubSbtRepo(path)
     }
   }
 }

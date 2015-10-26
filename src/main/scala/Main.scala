@@ -63,5 +63,16 @@ object Main extends App with StrictLogging {
           }
         }
       }
+    case "tests" :: Nil =>
+      val dir = "./tmp/"
+      val files = new File(dir).list()
+      val disl = new DiSLRun
+      for (file <- files) {
+        val tester = LocalGitHubRepo.getRepo(dir + file).getTester()
+        disl.run {
+          val exitCode = tester.test()
+          logger.info(s"Test results for $file: $exitCode")
+        }
+      }
   }
 }

@@ -39,6 +39,8 @@ class DiSLRun {
       val fu = setup()
       try {
         Await.ready(fu, 5 seconds)
+      } catch {
+        case e: TimeoutException => ()
       } finally {
         while (!serverStarted) {
           failed match {
