@@ -30,6 +30,6 @@ object DiSLJava extends ScriptInstaller {
   def install() {
     cp(Path(DiSLConfig.javaHome), Path(fakeJavaHome))
     install(dir, content)
-    install(fakeJavaHome + "/bin/java", content)
+    //install(fakeJavaHome + "/bin/java", content)
   }
 }
