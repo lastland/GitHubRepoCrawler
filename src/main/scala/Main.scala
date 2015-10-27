@@ -65,7 +65,7 @@ object Main extends App with StrictLogging {
         }
       }
     case "tests" :: Nil =>
-      val dir = "./tmp/"
+      val dir = MainArguments.outputFolder;
       val files = new File(dir).list()
       val disl = new DiSLRun
       for (file <- files) {
