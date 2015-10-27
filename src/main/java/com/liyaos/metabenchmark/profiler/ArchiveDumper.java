@@ -14,14 +14,6 @@ public class ArchiveDumper implements Dumper {
         p = new PrintWriter(fileName);
     }
 
-    public ArchiveDumper(String fileName, boolean overwriteExistingFile) throws FileNotFoundException {
-        if (overwriteExistingFile) {
-            p = new PrintWriter(fileName);
-        }else{
-            p = new PrintWriter(new File(fileName));
-        }
-    }
-
     public void close() {
         p.close();
     }

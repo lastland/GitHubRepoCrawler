@@ -40,14 +40,6 @@ public class Instrumentation {
     static void onMethodExit(MethodStaticContext msc) {
 	Profiler.endTimer(msc.thisMethodFullName());
         long executionTime = System.nanoTime() - start;
-
-        try {
-            try (Dumper dumper = new ArchiveDumper("tests" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName(), false)) {
-                dumper.println(msc.thisMethodFullName() + " executiont time of the test: " + executionTime);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
 //	@AfterReturning(marker = BytecodeMarker.class, args = "new", order = 0)

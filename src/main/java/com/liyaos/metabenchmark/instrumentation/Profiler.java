@@ -147,7 +147,7 @@ public class Profiler {
 
     public static void dump() {
         try {
-            try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName(), false)) {
+            try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName())) {
                 runnings(dumper);
                 executionTimes.entrySet().forEach(r ->
                         dumper.println("Execution time for " + r.getKey() + ": " + r.getValue()));
