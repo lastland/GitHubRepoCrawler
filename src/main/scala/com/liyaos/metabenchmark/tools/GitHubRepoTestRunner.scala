@@ -21,7 +21,7 @@ import Phase._
 case class FilterOutException(phase: Phase) extends Exception
 
 object GitHubRepoTestRunner extends StrictLogging {
-  def run(disl: DiSLRun, r: GitHubRepo, matchImport: String,
+  def run(disl: DiSLRun, r: GitHubRepo, matchImports: Array[String],
           downloadDir: String = MainArguments.outputFolder, deleteFailed: Boolean = true) = Future {
     if (r.commitNum >= 100 && r.releaseNum >= 5 && r.branchNum > 1) {
       logger.info(s"trying $r")
@@ -32,7 +32,8 @@ object GitHubRepoTestRunner extends StrictLogging {
           Paths.get(downloadDir, r.name).toAbsolutePath).imports
         logger.debug(s"$r imports: $imports")
         val flag = imports exists { im =>
-          im.contains(matchImport)
+          matchImports.exists(matchImp
+            => im.contains(matchImp))
         }
         if (flag) {
           logger.info(s"Found $r")
