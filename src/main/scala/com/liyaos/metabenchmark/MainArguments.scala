@@ -5,7 +5,7 @@ package com.liyaos.metabenchmark
  */
 object MainArguments {
 
-  val outputFolder: String = "./actors/";
-  val classToFilter: String = "akka.actor.Actor";
+  val outputFolder: String = "./threadpool/";
+  val classToFilter: String = "java.util.concurrent.ThreadPoolExecutor";
 
 }

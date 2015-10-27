@@ -10,10 +10,6 @@ import ch.usi.dag.disl.annotation.SyntheticLocal;
 import ch.usi.dag.disl.marker.BodyMarker;
 import ch.usi.dag.disl.staticcontext.MethodStaticContext;
 import ch.usi.dag.disl.dynamiccontext.DynamicContext;
-import com.liyaos.metabenchmark.profiler.ArchiveDumper;
-import com.liyaos.metabenchmark.profiler.Dumper;
-
-import java.io.FileNotFoundException;
 
 public class Instrumentation {
 
@@ -32,12 +28,13 @@ public class Instrumentation {
     static long start;
 
     @Before(marker = BodyMarker.class, guard = GuardUnitTest.class)
-    static void onMethodEntry() {
-        start = System.nanoTime();
+    static void onMethodEntry(MethodStaticContext msc) {
+        Profiler.startTimer(msc.thisMethodFullName());
     }
 
     @After(marker = BodyMarker.class, guard = GuardUnitTest.class)
     static void onMethodExit(MethodStaticContext msc) {
+		Profiler.endTimer(msc.thisMethodFullName());
         long executionTime = System.nanoTime() - start;
 
         try {

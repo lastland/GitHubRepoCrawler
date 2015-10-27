@@ -104,12 +104,20 @@ public class Profiler {
 
     public static ConcurrentHashMap<Object, Integer> objCount;
 
+    public static ConcurrentHashMap<String, Long> startTimes;
+
+    public static ConcurrentHashMap<String, Long> executionTimes;
+
     static {
         runnings = new ConcurrentHashMap<>();
 
         count = new ConcurrentHashMap<>();
 
         objCount = new ConcurrentHashMap<>();
+
+        startTimes = new ConcurrentHashMap<>();
+
+        executionTimes = new ConcurrentHashMap<>();
 
         Runtime.getRuntime().addShutdownHook(new Thread(Profiler::dump));
     }
@@ -141,6 +149,8 @@ public class Profiler {
         try {
             try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName(), false)) {
                 runnings(dumper);
+                executionTimes.entrySet().forEach(r ->
+                        dumper.println("Execution time for " + r.getKey() + ": " + r.getValue()));
                 //dumper.println("----");
                 //objCount.entrySet().forEach(r -> dumper.println(r.getKey() + " : " + r.getValue()));
                 //dumper.println("----");
@@ -173,6 +183,15 @@ public class Profiler {
 
     public static void poolEnd(Runnable r) {
         runnings.get(r).peekLast().end();
+    }
+
+    public static void startTimer(String m) {
+        startTimes.put(m, Long.valueOf(System.nanoTime()));
+    }
+
+    public static void endTimer(String m) {
+        long startTime = startTimes.get(m);
+        executionTimes.put(m, Long.valueOf(System.nanoTime() - startTime));
     }
 
     public static void test(Object ob) {
