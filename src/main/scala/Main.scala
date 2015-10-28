@@ -23,6 +23,11 @@ object Main extends App with StrictLogging {
         GitHubRepoDatabase.DB.withDynSession {
           gitHubRepos.ddl.create
         }
+      }
+      catch {
+        case e => println(e)
+      }
+      try{
         TestedRepoDatabase.DB.withDynSession {
           gitHubRepos.ddl.create
         }
