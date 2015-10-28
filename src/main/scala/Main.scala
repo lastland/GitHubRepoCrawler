@@ -73,7 +73,7 @@ object Main extends App with StrictLogging {
                    | ${e.getStackTrace.mkString("\n")}""".stripMargin
               )
             }
-            f. onSuccess {
+            f onSuccess {
               case e: Any => TestedRepoDatabase.addRepo(repo.toGitHubRepo)
             }
           }
