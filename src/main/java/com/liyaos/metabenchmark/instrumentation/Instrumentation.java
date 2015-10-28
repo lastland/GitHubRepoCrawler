@@ -17,16 +17,16 @@ import java.io.FileNotFoundException;
 
 public class Instrumentation {
 
-    @Before(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.beforeExecute")
-    public static void test(DynamicContext dc) {
-        Profiler.poolBegin(dc.getMethodArgumentValue(0, Thread.class),
-                dc.getMethodArgumentValue(1, Runnable.class));
-    }
-
-    @After(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.afterExecute")
-    public static void end(DynamicContext dc) {
-        Profiler.poolEnd(dc.getMethodArgumentValue(0, Runnable.class));
-    }
+//    @Before(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.beforeExecute")
+//    public static void test(DynamicContext dc) {
+//        Profiler.poolBegin(dc.getMethodArgumentValue(0, Thread.class),
+//                dc.getMethodArgumentValue(1, Runnable.class));
+//    }
+//
+//    @After(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.afterExecute")
+//    public static void end(DynamicContext dc) {
+//        Profiler.poolEnd(dc.getMethodArgumentValue(0, Runnable.class));
+//    }
 
     @SyntheticLocal
     static long start;
@@ -38,8 +38,7 @@ public class Instrumentation {
 
     @After(marker = BodyMarker.class, guard = GuardUnitTest.class)
     static void onMethodExit(MethodStaticContext msc) {
-	Profiler.endTimer(msc.thisMethodFullName());
-        long executionTime = System.nanoTime() - start;
+	    Profiler.endTimer(msc.thisMethodFullName());
     }
 
 //	@AfterReturning(marker = BytecodeMarker.class, args = "new", order = 0)
