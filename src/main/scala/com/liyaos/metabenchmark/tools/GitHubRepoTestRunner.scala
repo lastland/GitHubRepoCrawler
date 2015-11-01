@@ -2,7 +2,7 @@ package com.liyaos.metabenchmark.tools
 
 import java.nio.file.{Paths, Path}
 
-import com.liyaos.metabenchmark.MainArguments
+import com.liyaos.metabenchmark.{FilterMode, MainArguments}
 import com.liyaos.metabenchmark.disl.{DiSLMvn, DiSLRun}
 import com.typesafe.scalalogging.StrictLogging
 import scala.concurrent.Future
@@ -28,12 +28,25 @@ object GitHubRepoTestRunner extends StrictLogging {
       val d = new GitHubDownloader(r)
       try {
         d.downloadTo(downloadDir)
-        val imports = new LocalRepoImportDetector(
-          Paths.get(downloadDir, r.name).toAbsolutePath).imports
-        logger.debug(s"$r imports: $imports")
-        val flag = imports exists { im =>
-          matchImports.exists(matchImp
-            => im.contains(matchImp))
+        var flag = false
+        MainArguments.mode match {
+          case FilterMode.Filter => {
+            val imports = new LocalRepoImportDetector(
+              Paths.get(downloadDir, r.name).toAbsolutePath).imports
+            logger.debug(s"$r imports: $imports")
+            flag = imports exists {
+              im =>
+                matchImports.exists(matchImp
+                => im.contains(matchImp))
+            }
+          }
+          case FilterMode.Body => {
+            val declarations = BodyRepoPatternDetector(
+              Paths.get(downloadDir, r.name).toAbsolutePath).declarations
+            declarations foreach { line =>
+               println("======> Located Matrix = " + line)
+            }
+          }
         }
         if (flag) {
           logger.info(s"Found $r")

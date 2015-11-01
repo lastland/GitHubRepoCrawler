@@ -14,4 +14,7 @@ object MainArguments {
 //    "java.util.concurrent.ExecutorService", "java.util.concurrent.AbstractExecutorService",
 //    "java.util.concurrent.ThreadPoolExecutor", "java.util.concurrent.ForkJoinPool");
 
+  val mode = FilterMode.Body
+
+  val regexPattern = "*[][]*"
 }
