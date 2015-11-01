@@ -42,7 +42,7 @@ object GitHubRepoTestRunner extends StrictLogging {
           }
           case FilterMode.Body => {
             val declarations = BodyRepoPatternDetector(
-              Paths.get(downloadDir, r.name).toAbsolutePath).declarations
+              Paths.get(downloadDir, r.name).toAbsolutePath, MainArguments.regexPattern).declarations
             declarations foreach { line =>
                logger.warn("======> Located Matrix = " + line)
             }

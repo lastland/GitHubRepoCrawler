@@ -13,31 +13,32 @@ import fastparse.all._
 
 case class NoDetectorException(file: File) extends Exception
 
-abstract class BodyPatternDetector(path: Path) extends BodyDetector
+abstract class BodyPatternDetector(path: Path, regex: String) extends BodyDetector
 
 object BodyPatternDetector {
-  def getDetector(file: File): BodyDetector = {
+  def getDetector(file: File, regex: String): BodyDetector = {
     if (file.isDirectory)
-      BodyRepoDirPatternDetector(Paths.get(file.getAbsolutePath))
+      BodyRepoDirPatternDetector(Paths.get(file.getAbsolutePath), regex)
     else if ((file.getName.toLowerCase.endsWith(".java")) || (file.getName.toLowerCase.endsWith(".scala")))
-      BodyRepoPatternDetector(Paths.get(file.getAbsolutePath))
+      BodyRepoPatternDetector(Paths.get(file.getAbsolutePath), regex)
     else throw NoDetectorException(file)
   }
 }
 
-case class BodyRepoPatternDetector(path: Path) extends BodyPatternDetector(path) {
+case class BodyRepoPatternDetector(path: Path, regex: String) extends BodyPatternDetector(path, regex) {
   override def declarations: Set[String] = {
-    val file = new File(path.toString)
-    BodyPatternDetector.getDetector(file).declarations
+    Source.fromFile(path.toFile).getLines().filter(_.trim.matches(regex)).map { line =>
+      line.trim
+    }.toSet
   }
 }
 
-case class BodyRepoDirPatternDetector(path: Path) extends BodyPatternDetector(path) {
+case class BodyRepoDirPatternDetector(path: Path, regex: String) extends BodyPatternDetector(path, regex) {
   override def declarations: Set[String] = {
     val file = new File(path.toString)
     file.listFiles().flatMap { f =>
       try {
-        BodyPatternDetector.getDetector(f).declarations
+        BodyPatternDetector.getDetector(f, regex).declarations
       } catch {
         case NoDetectorException(eFile) =>
           Set[String]()
