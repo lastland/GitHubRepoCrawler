@@ -20,12 +20,19 @@ object BodyPatternDetector {
     if (file.isDirectory)
       BodyRepoDirPatternDetector(Paths.get(file.getAbsolutePath), regex)
     else if ((file.getName.toLowerCase.endsWith(".java")) || (file.getName.toLowerCase.endsWith(".scala")))
-      BodyRepoPatternDetector(Paths.get(file.getAbsolutePath), regex)
+      BodyRepoFilePatternDetector(Paths.get(file.getAbsolutePath), regex)
     else throw NoDetectorException(file)
   }
 }
 
 case class BodyRepoPatternDetector(path: Path, regex: String) extends BodyPatternDetector(path, regex) {
+  override def declarations: Set[String] = {
+    val file = new File(path.toString)
+    BodyPatternDetector.getDetector(file, regex).declarations
+  }
+}
+
+case class BodyRepoFilePatternDetector(path: Path, regex: String) extends BodyPatternDetector(path, regex) {
   override def declarations: Set[String] = {
     Source.fromFile(path.toFile).getLines().filter(_.trim.matches(regex)).map { line =>
       line.trim
