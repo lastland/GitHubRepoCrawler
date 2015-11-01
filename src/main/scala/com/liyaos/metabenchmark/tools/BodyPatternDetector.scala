@@ -11,7 +11,7 @@ import java.io.File
 import scala.io.Source
 import fastparse.all._
 
-case class NoViableDetectorException(file: File) extends Exception
+case class NoDetectorException(file: File) extends Exception
 
 abstract class BodyPatternDetector(path: Path) extends BodyDetector
 
@@ -21,7 +21,7 @@ object BodyPatternDetector {
       BodyRepoDirPatternDetector(Paths.get(file.getAbsolutePath))
     else if ((file.getName.toLowerCase.endsWith(".java")) || (file.getName.toLowerCase.endsWith(".scala")))
       BodyRepoPatternDetector(Paths.get(file.getAbsolutePath))
-    else throw NoViableDetectorException(file)
+    else throw NoDetectorException(file)
   }
 }
 
@@ -39,7 +39,7 @@ case class BodyRepoDirPatternDetector(path: Path) extends BodyPatternDetector(pa
       try {
         BodyPatternDetector.getDetector(f).declarations
       } catch {
-        case NoViableDetectorException(eFile) =>
+        case NoDetectorException(eFile) =>
           Set[String]()
       }
     }.toSet
@@ -52,8 +52,4 @@ case class PatternDetector(path: Path, regex: String) extends BodyDetector {
       line.trim
     }.toSet
   }
-}
-
-trait ScalaBasics {
-  val word: P[Unit]= P(CharIn('a' to 'z' ) ~ CharIn(('a' to 'z') ++ ('0' to '9')).rep(0))
 }
