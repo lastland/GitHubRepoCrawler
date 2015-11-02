@@ -7,7 +7,8 @@ import java.util.regex.Pattern
  */
 object MainArguments {
 
-  val outputFolder: String = "./actors/";
+  val outputFolder: String = "./spark/";
+//  val classToFilter: Array[String] =  Array("org.apache.spark", )
   val classToFilter: Array[String] =  Array("akka.actor.Actor", "akka.actor.UntypedActor",
     "scala.actors.Actor", "org.jetlang.fibers.Fiber", "fj.control.parallel.Actor",
     "groovyx.gpars.actor.Actor", "edu.rice.hj.api.HjActor", "fi.jumi.actors.Actors",
@@ -17,8 +18,10 @@ object MainArguments {
 //    "java.util.concurrent.ThreadPoolExecutor", "java.util.concurrent.ForkJoinPool");
 
   val mode = FilterMode.Body
-  val re1=".*?";	// Non-greedy match on filler
+  val star=".*?";	// Non-greedy match on filler
   val re2="(\\[.*?\\])";	// Square Braces 1
   val re3="(\\[.*?\\])";	// Square Braces 2
-  val regex = re1 + re2 + re3;
+  val re5="(=)";	// Any Single Character 1
+  val re7="(new)";	// Word 1
+  val regex = star + re2 + re3 + star + re5 + star + re7 + star;
 }
