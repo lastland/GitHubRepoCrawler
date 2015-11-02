@@ -6,7 +6,7 @@ package com.liyaos.metabenchmark.tools
 
 import java.nio.file.{Paths, Path}
 import java.io.File
-
+import java.util.regex.Pattern;
 
 import scala.io.Source
 import fastparse.all._
@@ -34,9 +34,8 @@ case class BodyRepoPatternDetector(path: Path, regex: String) extends BodyPatter
 
 case class BodyRepoFilePatternDetector(path: Path, regex: String) extends BodyPatternDetector(path, regex) {
   override def declarations: Set[String] = {
-    Source.fromFile(path.toFile).getLines().filter(_.trim.matches(regex)).map { line =>
-      line.trim
-    }.toSet
+    val pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL)
+    Source.fromFile(path.toFile).getLines().filter(line => pattern.matcher(line.trim).matches()).toSet
   }
 }
 

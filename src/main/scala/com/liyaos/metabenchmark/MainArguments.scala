@@ -1,5 +1,7 @@
 package com.liyaos.metabenchmark
 
+import java.util.regex.Pattern
+
 /**
  * Created by salucl on 23/10/15.
  */
@@ -15,6 +17,8 @@ object MainArguments {
 //    "java.util.concurrent.ThreadPoolExecutor", "java.util.concurrent.ForkJoinPool");
 
   val mode = FilterMode.Body
-
-  val regexPattern = "*[][]*"
+  val re1=".*?";	// Non-greedy match on filler
+  val re2="(\\[.*?\\])";	// Square Braces 1
+  val re3="(\\[.*?\\])";	// Square Braces 2
+  val regex = re1 + re2 + re3;
 }

@@ -41,11 +41,11 @@ object GitHubRepoTestRunner extends StrictLogging {
             }
           }
           case FilterMode.Body => {
-            logger.warn("======> Using Filter Mode")
+            logger.info("======> Using Filter Mode")
             val declarations = BodyRepoPatternDetector(
-              Paths.get(downloadDir, r.name).toAbsolutePath, MainArguments.regexPattern).declarations
+              Paths.get(downloadDir, r.name).toAbsolutePath, MainArguments.regex).declarations
             declarations foreach { line =>
-               logger.warn("======> Located Matrix = " + line)
+               logger.info("======> Located Matrix = " + line)
             }
           }
         }
