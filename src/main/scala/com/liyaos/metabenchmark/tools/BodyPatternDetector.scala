@@ -35,7 +35,7 @@ case class BodyRepoPatternDetector(path: Path, regex: String) extends BodyPatter
 case class BodyRepoFilePatternDetector(path: Path, regex: String) extends BodyPatternDetector(path, regex) {
   override def declarations: Set[String] = {
     val pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL)
-    Source.fromFile(path.toFile).getLines().filter(line => pattern.matcher(line.trim).matches()).toSet
+    Source.fromFile(path.toFile).getLines().filter(line => (!line.trim.startsWith("//")) && (!line.trim.startsWith("*")) && (pattern.matcher(line.trim).matches()) ).toSet
   }
 }
 

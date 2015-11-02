@@ -41,7 +41,6 @@ object GitHubRepoTestRunner extends StrictLogging {
             }
           }
           case FilterMode.Body => {
-            logger.info("======> Using Filter Mode")
             val declarations = BodyRepoPatternDetector(
               Paths.get(downloadDir, r.name).toAbsolutePath, MainArguments.regex).declarations
             declarations foreach { line =>
