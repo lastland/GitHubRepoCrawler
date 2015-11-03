@@ -5,10 +5,13 @@ package com.liyaos.metabenchmark.instrumentation;
  */
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
+import com.liyaos.metabenchmark.MainArguments;
 import com.liyaos.metabenchmark.profiler.ArchiveDumper;
 import com.liyaos.metabenchmark.profiler.Dumper;
 import com.liyaos.metabenchmark.profiler.TTYDumper;
@@ -98,6 +101,8 @@ public class Profiler {
     public static final long MS = 1000000;
     public static final long STRIDE = 100 * MS;
 
+    public static AtomicLong idGenerator = new AtomicLong();
+
     public static ConcurrentHashMap<Runnable, ConcurrentLinkedDeque<RunningState>> runnings;
 
     public static ConcurrentHashMap<Object, Integer> count;
@@ -107,6 +112,8 @@ public class Profiler {
     public static ConcurrentHashMap<String, Long> startTimes;
 
     public static ConcurrentHashMap<String, Long> executionTimes;
+
+    public static ConcurrentHashMap<Long, Integer> arraySizes;
 
     static {
         runnings = new ConcurrentHashMap<>();
@@ -149,11 +156,17 @@ public class Profiler {
         try {
             try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName())) {
                 runnings(dumper);
-                executionTimes.entrySet().forEach(r ->
-                        dumper.println("Execution time for " + r.getKey() + ": " + r.getValue()));
-                //dumper.println("----");
-                //objCount.entrySet().forEach(r -> dumper.println(r.getKey() + " : " + r.getValue()));
-                //dumper.println("----");
+                for (Map.Entry<Long, Integer> tuple : arraySizes.entrySet()) {
+                    if (tuple.getValue() > MainArguments.matrixSizeTreshold()){
+                        dumper.println("====> Found Matrix of size " + tuple.getValue());
+                        executionTimes.entrySet().forEach(r ->
+                                dumper.println("Execution time for " + r.getKey() + ": " + r.getValue()));
+                        break;
+                    }
+                    else{
+                        dumper.println("====> Discarded Matrix of size " + tuple.getValue());
+                    }
+                }
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -192,6 +205,10 @@ public class Profiler {
     public static void endTimer(String m) {
         long startTime = startTimes.get(m);
         executionTimes.put(m, Long.valueOf(System.nanoTime() - startTime));
+    }
+
+    public static void addArraySize(int size) {
+        arraySizes.put(idGenerator.getAndIncrement(), size);
     }
 
     public static void test(Object ob) {

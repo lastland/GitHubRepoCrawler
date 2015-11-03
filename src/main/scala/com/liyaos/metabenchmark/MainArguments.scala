@@ -17,9 +17,12 @@ object MainArguments {
 //    "java.util.concurrent.ExecutorService", "java.util.concurrent.AbstractExecutorService",
 //    "java.util.concurrent.ThreadPoolExecutor", "java.util.concurrent.ForkJoinPool");
 
+
+  val matrixSizeTreshold = 10E5;
   val mode = FilterMode.Body
+
   val star=".*?";	// Non-greedy match on filler
-  val numType="(BigDecimal|BigInteger||Double|Float|Integer|Long|Short)";
+  val numType="(BigDecimal|BigInteger|Double|Float|Integer|Long|Short|double|float|int|long|short)";
   val squareBrackets="(\\[.*?\\])";	// Square Braces 1
   val assign="(=)";	// Any Single Character 1
   val newKey="(new)";	// Word 1
