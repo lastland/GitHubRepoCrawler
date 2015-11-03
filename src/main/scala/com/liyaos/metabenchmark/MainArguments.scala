@@ -19,9 +19,10 @@ object MainArguments {
 
   val mode = FilterMode.Body
   val star=".*?";	// Non-greedy match on filler
-  val re2="(\\[.*?\\])";	// Square Braces 1
-  val re3="(\\[.*?\\])";	// Square Braces 2
-  val re5="(=)";	// Any Single Character 1
-  val re7="(new)";	// Word 1
-  val regex = star + re2 + re3 + star + re5 + star + re7 + star;
+  val numType="(BigDecimal|BigInteger||Double|Float|Integer|Long|Short)";
+  val squareBrackets="(\\[.*?\\])";	// Square Braces 1
+  val assign="(=)";	// Any Single Character 1
+  val newKey="(new)";	// Word 1
+  val regex = star + numType + star + squareBrackets + squareBrackets +
+      star + assign + star + newKey + star + numType + star;
 }
