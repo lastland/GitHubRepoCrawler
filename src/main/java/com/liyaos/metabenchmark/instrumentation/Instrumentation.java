@@ -31,12 +31,6 @@ public class Instrumentation {
 	    Profiler.endTimer(msc.thisMethodFullName());
     }
 
-    @Before (marker = BytecodeMarker.class, args = "newarray, anewarray")
-    public static void beforeArray (final DynamicContext di) {
-        int size = di.getStackValue (0, Integer.class);
-        Profiler.addArraySize(size);
-    }
-
     @SyntheticLocal
     static int size0; //int[1024][2056], size0 = 2056
 
