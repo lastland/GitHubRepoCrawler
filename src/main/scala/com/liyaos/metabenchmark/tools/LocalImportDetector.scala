@@ -21,6 +21,8 @@ object LocalImportDetector {
       LocalRepoJavaImportDetector(Paths.get(file.getAbsolutePath))
     else if (file.getName.toLowerCase.endsWith(".scala"))
       LocalRepoScalaImportDetector(Paths.get(file.getAbsolutePath))
+    else if (file.getName.toLowerCase.endsWith(".py"))
+      LocalRepoPythonImportDetector(Paths.get(file.getAbsolutePath))
     else throw NoViableDetectorException(file)
   }
 }
@@ -69,6 +71,14 @@ case class LocalRepoScalaImportDetector(path: Path) extends LocalImportDetector(
       }
     }.flatten.flatten
   }.toSet
+}
+
+case class LocalRepoPythonImportDetector(path: Path) extends LocalImportDetector(path) {
+  override def imports: Set[String] = {
+    Source.fromFile(path.toFile).getLines().map(_.trim).filter { trimmedLine =>
+      trimmedLine.startsWith("from") || trimmedLine.startsWith("import");
+    }.toSet
+  }
 }
 
 trait ScalaBasics {

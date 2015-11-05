@@ -43,7 +43,7 @@ object Main extends App with StrictLogging {
       }
     case "run" :: Nil =>
       val repos = new GitHubRepos
-      val stream = repos.searchLanguage("Java") #::: repos.searchLanguage("Scala")
+      val stream = repos.searchLanguage("Java") #::: repos.searchLanguage("Scala") #::: repos.searchLanguage("Python")
       for (repo <- stream) {
         GitHubRepoDatabase.DB.withDynSession {
           GitHubRepoDatabase.addRepo(repo)
