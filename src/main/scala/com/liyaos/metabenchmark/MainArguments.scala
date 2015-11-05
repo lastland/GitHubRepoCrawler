@@ -7,8 +7,8 @@ import java.util.regex.Pattern
  */
 object MainArguments {
 
-  val outputFolder: String = "./spark/";
-  val classToFilter: Array[String] =  Array("org.apache.spark", "from pyspark")
+  val outputFolder: String = "./matrix/";
+//  val classToFilter: Array[String] =  Array("org.apache.spark", "from pyspark")
 //  val classToFilter: Array[String] =  Array("akka.actor.Actor", "akka.actor.UntypedActor",
 //    "scala.actors.Actor", "org.jetlang.fibers.Fiber", "fj.control.parallel.Actor",
 //    "groovyx.gpars.actor.Actor", "edu.rice.hj.api.HjActor", "fi.jumi.actors.Actors",
@@ -19,7 +19,7 @@ object MainArguments {
 
 
   val matrixSizeTreshold = 1;
-  val mode = FilterMode.Imports
+  val mode = FilterMode.Body
 
   val star=".*?";	// Non-greedy match on filler
   val numType="(BigDecimal|BigInteger|Double|Float|Integer|Long|Short|double|float|int|long|short)";
