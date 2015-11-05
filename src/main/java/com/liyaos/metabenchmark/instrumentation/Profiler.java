@@ -126,6 +126,8 @@ public class Profiler {
 
         executionTimes = new ConcurrentHashMap<>();
 
+        arraySizes = new ConcurrentHashMap<>();
+
         Runtime.getRuntime().addShutdownHook(new Thread(Profiler::dump));
     }
 
