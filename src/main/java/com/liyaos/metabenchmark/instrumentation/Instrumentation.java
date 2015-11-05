@@ -18,17 +18,6 @@ import java.io.FileNotFoundException;
 
 public class Instrumentation {
 
-//    @Before(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.beforeExecute")
-//    public static void test(DynamicContext dc) {
-//        Profiler.poolBegin(dc.getMethodArgumentValue(0, Thread.class),
-//                dc.getMethodArgumentValue(1, Runnable.class));
-//    }
-//
-//    @After(marker = BodyMarker.class, scope = "java.util.concurrent.ThreadPoolExecutor.afterExecute")
-//    public static void end(DynamicContext dc) {
-//        Profiler.poolEnd(dc.getMethodArgumentValue(0, Runnable.class));
-//    }
-
     @SyntheticLocal
     static long start;
 
@@ -54,6 +43,17 @@ public class Instrumentation {
     @SyntheticLocal
     static int size1; //int[1024][2056], size1 = 1024
 
+    @Before (
+            marker = BytecodeMarker.class,
+            args = "multianewarray",
+            guard = Guard.TwoPrimitiveArrayAllocations.class
+    )
+    public static void beforeTwoPrimitiveArrayAllocation (
+            final DynamicContext dc, final MultiArrayStaticContext masc
+    ) {
+        size0 = dc.getStackValue (0, int.class);
+        size1 = dc.getStackValue (1, int.class);
+    }
 
 
     /**
@@ -87,8 +87,8 @@ public class Instrumentation {
     public static void beforeTwoReferenceArrayAllocation (
             final DynamicContext dc, final MultiArrayStaticContext masc
     ) {
-        int size0 = dc.getStackValue (0, int.class);
-        int size1 = dc.getStackValue (1, int.class);
+        size0 = dc.getStackValue (0, int.class);
+        size1 = dc.getStackValue (1, int.class);
 
         Profiler.addArraySize(size0 * size1);
     }
@@ -116,38 +116,4 @@ public class Instrumentation {
 
         final Object ref = dc.getStackValue (StackIndex.STACK_TOP, Object.class);
     }
-
-
-//	@AfterReturning(marker = BytecodeMarker.class, args = "new", order = 0)
-//	static void profileActualAllocation(EnhancedBytecodeStaticContext context) {
-//		GraalDirectives.instrumentationBegin(-1);
-//		Profiler.profileAllocation(context.bci(), GraalDirectives.runtimePath());
-//		GraalDirectives.instrumentationEnd();
-//	}
-//
-//	@AfterReturning(marker = BytecodeMarker.class, args = "new", order = 1)
-//	static void profileAllocation(EnhancedBytecodeStaticContext context) {
-//		GraalDirectives.instrumentationBegin(0);
-//		Profiler.profileAllocation(context.bci(), 2);
-//		GraalDirectives.instrumentationEnd();
-//	}
-
-    /*
-    //@After(marker = BodyMarker.class, scope = "org.apache.commons.collections4.bag.HashBag.getCount")
-    @After(marker = BodyMarker.class, scope = "com.liyaos.concurrent.factorial.*.*")
-    public static void allOfthem(DynamicContext dc) {
-        Object m = dc.getThis();
-        if (m != null) {
-            Profiler.log(m);
-        }
-    }
-
-    @Before(marker = BodyMarker.class, scope="java.lang.ProcessImpl.start")
-    static void profile(DynamicContext dc) {
-        String[] cmd = (String[]) dc.getMethodArgumentValue(0, Object.class);
-        for (String c : cmd) {
-            System.out.println( c );
-        }
-    }
-    */
 }
