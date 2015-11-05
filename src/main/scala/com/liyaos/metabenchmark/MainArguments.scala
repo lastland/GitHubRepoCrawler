@@ -8,7 +8,7 @@ import java.util.regex.Pattern
 object MainArguments {
 
   val outputFolder: String = "./matrix/";
-//  val classToFilter: Array[String] =  Array("org.apache.spark", "from pyspark")
+  val classToFilter: Array[String] =  Array("org.apache.spark", "from pyspark")
 //  val classToFilter: Array[String] =  Array("akka.actor.Actor", "akka.actor.UntypedActor",
 //    "scala.actors.Actor", "org.jetlang.fibers.Fiber", "fj.control.parallel.Actor",
 //    "groovyx.gpars.actor.Actor", "edu.rice.hj.api.HjActor", "fi.jumi.actors.Actors",
