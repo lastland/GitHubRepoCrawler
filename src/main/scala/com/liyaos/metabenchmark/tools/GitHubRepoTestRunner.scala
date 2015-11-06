@@ -30,7 +30,7 @@ object GitHubRepoTestRunner extends StrictLogging {
         d.downloadTo(downloadDir)
         var flag = false
         MainArguments.mode match {
-          case FilterMode.Filter => {
+          case FilterMode.Imports => {
             val imports = new LocalRepoImportDetector(
               Paths.get(downloadDir, r.name).toAbsolutePath).imports
             logger.debug(s"$r imports: $imports")
