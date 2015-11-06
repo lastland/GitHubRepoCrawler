@@ -12,7 +12,7 @@ import scala.slick.driver.H2Driver.simple._
 import Database.dynamicSession
 import scala.slick.jdbc.StaticQuery._
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.liyaos.metabenchmark.database.{GitHubRepoDatabase, Tables}
+import com.liyaos.metabenchmark.database.{TestedRepoDatabase, GitHubRepoDatabase, Tables}
 import com.liyaos.metabenchmark.tools._
 import Tables._
 
@@ -21,6 +21,14 @@ object Main extends App with StrictLogging {
     case "init" :: Nil =>
       try {
         GitHubRepoDatabase.DB.withDynSession {
+          gitHubRepos.ddl.create
+        }
+      }
+      catch {
+        case e => println(e)
+      }
+      try{
+        TestedRepoDatabase.DB.withDynSession {
           gitHubRepos.ddl.create
         }
       } catch {
@@ -35,7 +43,7 @@ object Main extends App with StrictLogging {
       }
     case "run" :: Nil =>
       val repos = new GitHubRepos
-      val stream = repos.searchLanguage("Java") #::: repos.searchLanguage("Scala")
+      val stream = repos.searchLanguage("Java") #::: repos.searchLanguage("Scala") #::: repos.searchLanguage("Python")
       for (repo <- stream) {
         GitHubRepoDatabase.DB.withDynSession {
           GitHubRepoDatabase.addRepo(repo)
@@ -48,19 +56,27 @@ object Main extends App with StrictLogging {
       val disl = new DiSLRun
       GitHubRepoDatabase.DB.withDynSession {
         for (repo <- gitHubRepos) {
-          val r = repo.toGitHubRepo
-          val f = GitHubRepoTestRunner.run(disl, r, MainArguments.classToFilter,
-            downloadDir = dir)
-          f onFailure {
-            case e: NoRecognizableBuildException =>
-              logger.debug(s"${r} with no recognizable build.")
-            case FilterOutException(phase) =>
-              logger.debug(s"${r} filtered out at ${phase}.")
-            case DownloadFailedException(f) =>
-              logger.debug(s"${r} download failed at ${f}.")
-            case e: Throwable => logger.info(
-              s"""${r}: ${e}
-           | ${e.getStackTrace.mkString("\n")}""".stripMargin)
+          if (!TestedRepoDatabase.existsRepo(repo.toGitHubRepo)) {
+            val r = repo.toGitHubRepo
+            val f = GitHubRepoTestRunner.run(disl, r, MainArguments.classToFilter,
+              downloadDir = dir)
+            f onFailure {
+              case e: NoRecognizableBuildException =>
+                logger.debug(s"${r} with no recognizable build.")
+              case FilterOutException(phase) =>
+                logger.debug(s"${r} filtered out at ${phase}.")
+              case DownloadFailedException(f) =>
+                logger.debug(s"${r} download failed at ${f}.")
+              case e: Throwable => logger.info(
+                s"""${r}: ${e}
+
+                   | ${e.getStackTrace.mkString("\n")}""".stripMargin
+              )
+            }
+            TestedRepoDatabase.addRepo(repo.toGitHubRepo)
+            f onSuccess {
+              case e: Any => TestedRepoDatabase.addRepo(repo.toGitHubRepo)
+            }
           }
         }
       }
