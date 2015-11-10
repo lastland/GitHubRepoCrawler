@@ -47,6 +47,7 @@ public class Instrumentation {
     ) {
         size0 = dc.getStackValue (0, int.class);
         size1 = dc.getStackValue (1, int.class);
+        Profiler.addArraySize(size0 * size1);
     }
 
 
