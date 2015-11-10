@@ -41,10 +41,10 @@ object GitHubRepoTestRunner extends StrictLogging {
             }
           }
           case FilterMode.Body => {
-            val declarations = BodyRepoPatternDetector(
-              Paths.get(downloadDir, r.name).toAbsolutePath, MainArguments.regex).declarations
-            declarations foreach { line =>
-               logger.info("======> Located Matrix = " + line)
+            val lines = BodyRepoPatternDetector(
+              Paths.get(downloadDir, r.name).toAbsolutePath, MainArguments.regex).lines
+            lines foreach { line =>
+               logger.info("======> Located Pattern = " + line)
             }
           }
         }
