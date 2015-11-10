@@ -158,6 +158,7 @@ public class Profiler {
         try {
             try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName())) {
                 runnings(dumper);
+                dumper.println("====> Checking Matrix size");
                 for (Map.Entry<Long, Integer> tuple : arraySizes.entrySet()) {
                     if (tuple.getValue() > MainArguments.matrixSizeTreshold()){
                         dumper.println("====> Found Matrix of size " + tuple.getValue());
