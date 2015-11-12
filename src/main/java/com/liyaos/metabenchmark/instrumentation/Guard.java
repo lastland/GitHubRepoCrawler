@@ -41,7 +41,7 @@ final class Guard {
 			try {
 				cl = Class.forName(className);					
 			} catch (ClassNotFoundException e) {
-				System.err.format("Error: Class %s not found!\n", className);				
+				//System.err.format("Error: Class %s not found!\n", className);				
 			}
 
 			if (cl != null) {

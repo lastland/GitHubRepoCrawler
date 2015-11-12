@@ -172,18 +172,19 @@ public class Profiler {
             try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName())) {
                 runnings(dumper);
                 dumpMethodInvocations(dumper);
-                for (Map.Entry<Long, Integer> tuple : arraySizes.entrySet()) {
-                    if (tuple.getValue() > MainArguments.matrixSizeTreshold()){
-                        dumper.println("====> Found Matrix of size " + tuple.getValue());
-                        executionTimes.entrySet().forEach(r ->
-                                dumper.println("Execution time for " + r.getKey() + ": " + r.getValue()));
-                        break;
-                    }
-                    else{
-                        dumper.println("====> Discarded Matrix of size " + tuple.getValue());
-                    }
-                }
-            }
+                
+//                for (Map.Entry<Long, Integer> tuple : arraySizes.entrySet()) {
+//                    if (tuple.getValue() > MainArguments.matrixSizeTreshold()){
+//                        dumper.println("====> Found Matrix of size " + tuple.getValue());
+//                        executionTimes.entrySet().forEach(r ->
+//                                dumper.println("Execution time for " + r.getKey() + ": " + r.getValue()));
+//                        break;
+//                    }
+//                    else{
+//                        dumper.println("====> Discarded Matrix of size " + tuple.getValue());
+//                    }
+//                }
+//            }
 
 
                 executionTimes.entrySet().forEach(r ->
