@@ -117,6 +117,8 @@ public class Profiler {
     
     public static ConcurrentHashMap<Object, Long> methodInvocations;
 
+    public static ConcurrentHashMap<String, Boolean> invokeDynamicUsed;
+
     static {
         runnings = new ConcurrentHashMap<>();
 
@@ -131,6 +133,8 @@ public class Profiler {
         arraySizes = new ConcurrentHashMap<>();
         
         methodInvocations = new ConcurrentHashMap<>();
+
+        invokeDynamicUsed = new ConcurrentHashMap<>();
 
         Runtime.getRuntime().addShutdownHook(new Thread(Profiler::dump));
     }
@@ -165,7 +169,6 @@ public class Profiler {
     }
 
     public static void dump() {
-        try {
             try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName())) {
                 runnings(dumper);
                 dumpMethodInvocations(dumper);
@@ -181,6 +184,23 @@ public class Profiler {
                     }
                 }
             }
+
+
+                executionTimes.entrySet().forEach(r ->
+                        dumper.println("Execution time for " + r.getKey() + ": " + r.getValue()));
+
+//                dumper.println("====> Checking Matrix size");
+//                for (Map.Entry<Long, Integer> tuple : arraySizes.entrySet()) {
+//                    if (tuple.getValue() > MainArguments.matrixSizeTreshold()){
+//                        dumper.println("====> Found Matrix of size " + tuple.getValue());
+//
+//                        break;
+//                    }
+//                    else{
+//                        dumper.println("====> Discarded Matrix of size " + tuple.getValue());
+//                    }
+//                }
+//            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -221,6 +241,10 @@ public class Profiler {
     }
 
     public static void addArraySize(int size) {
+        arraySizes.put(idGenerator.getAndIncrement(), size);
+    }
+
+    public static void invokeDynamicUsed(int size) {
         arraySizes.put(idGenerator.getAndIncrement(), size);
     }
 

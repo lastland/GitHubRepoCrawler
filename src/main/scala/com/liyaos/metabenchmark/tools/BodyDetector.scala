@@ -5,5 +5,5 @@ package com.liyaos.metabenchmark.tools
  */
 
 abstract class BodyDetector {
-  def declarations: Set[String]
+  def lines: Set[String]
 }

@@ -26,25 +26,25 @@ object BodyPatternDetector {
 }
 
 case class BodyRepoPatternDetector(path: Path, regex: String) extends BodyPatternDetector(path, regex) {
-  override def declarations: Set[String] = {
+  override def lines: Set[String] = {
     val file = new File(path.toString)
-    BodyPatternDetector.getDetector(file, regex).declarations
+    BodyPatternDetector.getDetector(file, regex).lines
   }
 }
 
 case class BodyRepoFilePatternDetector(path: Path, regex: String) extends BodyPatternDetector(path, regex) {
-  override def declarations: Set[String] = {
+  override def lines: Set[String] = {
     val pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL)
     Source.fromFile(path.toFile).getLines().filter(line => (!line.trim.startsWith("//")) && (!line.trim.startsWith("*")) && (pattern.matcher(line.trim).matches()) ).toSet
   }
 }
 
 case class BodyRepoDirPatternDetector(path: Path, regex: String) extends BodyPatternDetector(path, regex) {
-  override def declarations: Set[String] = {
+  override def lines: Set[String] = {
     val file = new File(path.toString)
     file.listFiles().flatMap { f =>
       try {
-        BodyPatternDetector.getDetector(f, regex).declarations
+        BodyPatternDetector.getDetector(f, regex).lines
       } catch {
         case NoDetectorException(eFile) =>
           Set[String]()
@@ -54,7 +54,7 @@ case class BodyRepoDirPatternDetector(path: Path, regex: String) extends BodyPat
 }
 
 case class PatternDetector(path: Path, regex: String) extends BodyDetector {
-  override def declarations: Set[String] = {
+  override def lines: Set[String] = {
     Source.fromFile(path.toFile).getLines().filter(_.trim.matches(regex)).map { line =>
       line.trim
     }.toSet

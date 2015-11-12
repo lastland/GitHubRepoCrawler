@@ -26,6 +26,12 @@ public class Instrumentation {
     
     @ThreadLocal
     static int methodInvocations = 0; //Old problem with double size variable allocation in DisL 2.1...
+    
+    @ThreadLocal
+    static boolean isInvokeDynamicUsed = false;
+
+    @ThreadLocal
+    static String testName;
 
     @Before(marker = BodyMarker.class, guard = ClassToInstrumentOnly.class)    
     static void updateMethodInvocation(final DynamicContext dc) {
@@ -38,30 +44,42 @@ public class Instrumentation {
     @Before(marker = BodyMarker.class, guard = GuardUnitTest.class)
     static void onMethodEntry(MethodStaticContext msc) {
         Profiler.startTimer(msc.thisMethodFullName());
+        isInvokeDynamicUsed = false;
     }
 
     @After(marker = BodyMarker.class, guard = GuardUnitTest.class)
     static void onMethodExit(MethodStaticContext msc) {
-	    Profiler.endTimer(msc.thisMethodFullName());
+        if (isInvokeDynamicUsed) {
+            Profiler.endTimer(msc.thisMethodFullName());
+        }
     }
 
-    @SyntheticLocal
-    static int size0; //int[1024][2056], size0 = 2056
-
-    @SyntheticLocal
-    static int size1; //int[1024][2056], size1 = 1024
-
-    @Before (
+    @AfterReturning (
             marker = BytecodeMarker.class,
-            args = "multianewarray",
-            guard = Guard.TwoPrimitiveArrayAllocations.class
+            args = "invokedynamic"
     )
-    public static void beforeTwoPrimitiveArrayAllocation (
-            final DynamicContext dc, final MultiArrayStaticContext masc
-    ) {
-        size0 = dc.getStackValue (0, int.class);
-        size1 = dc.getStackValue (1, int.class);
+    public static void invokedynamicHappened (MethodStaticContext msc) {
+        isInvokeDynamicUsed = true;
     }
+
+//    @SyntheticLocal
+//    static int size0; //int[1024][2056], size0 = 2056
+//
+//    @SyntheticLocal
+//    static int size1; //int[1024][2056], size1 = 1024
+//
+//    @Before (
+//            marker = BytecodeMarker.class,
+//            args = "multianewarray",
+//            guard = Guard.TwoPrimitiveArrayAllocations.class
+//    )
+//    public static void beforeTwoPrimitiveArrayAllocation (
+//            final DynamicContext dc, final MultiArrayStaticContext masc
+//    ) {
+//        size0 = dc.getStackValue (0, int.class);
+//        size1 = dc.getStackValue (1, int.class);
+//        Profiler.addArraySize(size0 * size1);
+//    }
 
 
     /**
@@ -76,30 +94,30 @@ public class Instrumentation {
      * annotation to avoid inserting exception handler for a bytecode that
      * cannot produce exception.
      */
-    @AfterReturning (
-            marker = BytecodeMarker.class,
-            args = "multianewarray",
-            guard = Guard.TwoPrimitiveArrayAllocations.class
-    )
-    public static void afterTwoPrimitiveArrayAllocation (
-            final DynamicContext dc, final MultiArrayStaticContext masc
-    ) {
-        final Object ref = dc.getStackValue (StackIndex.STACK_TOP, Object.class);
-    }
-
-    @Before (
-            marker = BytecodeMarker.class,
-            args = "multianewarray",
-            guard = Guard.TwoReferenceArrayAllocations.class
-    )
-    public static void beforeTwoReferenceArrayAllocation (
-            final DynamicContext dc, final MultiArrayStaticContext masc
-    ) {
-        size0 = dc.getStackValue (0, int.class);
-        size1 = dc.getStackValue (1, int.class);
-
-        Profiler.addArraySize(size0 * size1);
-    }
+//    @AfterReturning (
+//            marker = BytecodeMarker.class,
+//            args = "multianewarray",
+//            guard = Guard.TwoPrimitiveArrayAllocations.class
+//    )
+//    public static void afterTwoPrimitiveArrayAllocation (
+//            final DynamicContext dc, final MultiArrayStaticContext masc
+//    ) {
+//        final Object ref = dc.getStackValue (StackIndex.STACK_TOP, Object.class);
+//    }
+//
+//    @Before (
+//            marker = BytecodeMarker.class,
+//            args = "multianewarray",
+//            guard = Guard.TwoReferenceArrayAllocations.class
+//    )
+//    public static void beforeTwoReferenceArrayAllocation (
+//            final DynamicContext dc, final MultiArrayStaticContext masc
+//    ) {
+//        size0 = dc.getStackValue (0, int.class);
+//        size1 = dc.getStackValue (1, int.class);
+//
+//        Profiler.addArraySize(size0 * size1);
+//    }
     /**
      * Emits an <i>array allocation</i> event for all intermediate arrays of a
      * multi-dimensional (at least 2) array of reference-type elements. This
@@ -113,15 +131,15 @@ public class Instrumentation {
      * annotation to avoid inserting exception handler for a bytecode that
      * cannot produce exception.
      */
-    @AfterReturning (
-            marker = BytecodeMarker.class,
-            args = "multianewarray",
-            guard = Guard.TwoReferenceArrayAllocations.class
-    )
-    public static void afterTwoReferenceArrayAllocation (
-            final DynamicContext dc, final MultiArrayStaticContext masc
-    ) {
-
-        final Object ref = dc.getStackValue (StackIndex.STACK_TOP, Object.class);
-    }
+//    @AfterReturning (
+//            marker = BytecodeMarker.class,
+//            args = "multianewarray",
+//            guard = Guard.TwoReferenceArrayAllocations.class
+//    )
+//    public static void afterTwoReferenceArrayAllocation (
+//            final DynamicContext dc, final MultiArrayStaticContext masc
+//    ) {
+//
+//        final Object ref = dc.getStackValue (StackIndex.STACK_TOP, Object.class);
+//    }
 }
