@@ -24,8 +24,6 @@ public class Instrumentation {
     @SyntheticLocal
     static long start;
     
-    @ThreadLocal
-    static int methodInvocations = 0; //Old problem with double size variable allocation in DisL 2.1...
     
     @ThreadLocal
     static boolean isInvokeDynamicUsed = false;
@@ -34,10 +32,9 @@ public class Instrumentation {
     static String testName;
 
     @Before(marker = BodyMarker.class, guard = ClassToInstrumentOnly.class)    
-    static void updateMethodInvocation(final DynamicContext dc) {
+    static void updateMethodInvocation(final DynamicContext dc, final MethodStaticContext msc) {
     
-    	methodInvocations++;       
-    	   Profiler.setMethodInvocation(dc.getThis(),methodInvocations);
+    Profiler.setMethodInvocation(dc.getThis(),msc.thisMethodFullName());
     	
     }
     

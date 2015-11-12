@@ -115,7 +115,7 @@ public class Profiler {
 
     public static ConcurrentHashMap<Long, Integer> arraySizes;
     
-    public static ConcurrentHashMap<Object, Long> methodInvocations;
+    public static ConcurrentHashMap<Object, String> methodInvocations;
 
     public static ConcurrentHashMap<String, Boolean> invokeDynamicUsed;
 
@@ -164,8 +164,9 @@ public class Profiler {
     
     public static void dumpMethodInvocations(Dumper dumper) {
     	for (Object key: methodInvocations.keySet())
-    		dumper.println("Methods invocation for object "+ key.toString() + "are " + methodInvocations.get(key));
-    	
+    	{	
+    		dumper.println("Method invoked: object "+ key + " ("+ key.getClass().toString() + ") - method: " + methodInvocations.get(key));
+    	}
     }
 
     public static void dump() {
@@ -254,9 +255,10 @@ public class Profiler {
         count.computeIfAbsent(ob, k -> 1);
     }
 
-	public static void setMethodInvocation(Object ob, long inv) {
-		if (ob != null)
-			methodInvocations.put(ob, inv);
+	public static void setMethodInvocation(Object ob, String method) {
+		if (ob != null) 
+			methodInvocations.put(ob,method);
+			
 		
 	}
 }
