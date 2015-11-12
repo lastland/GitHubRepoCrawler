@@ -5,7 +5,10 @@ package com.liyaos.metabenchmark.disl
  */
 
 import java.io.FileWriter
+import java.text.MessageFormat
 import java.util.concurrent.TimeoutException
+import com.liyaos.metabenchmark.{UseCases, MainArguments}
+
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,7 +19,13 @@ class FailedStartDiSLServerException extends Exception
 class DiSLRun {
   var serverStarted = false
   var failed: Option[Throwable] = None
-  val cmd = s"${DiSLConfig.dislProgram} -d ${DiSLConfig.dislHome} -dc ${DiSLConfig.instProgram} -cs ${DiSLConfig.instDir}"
+  val cmdFormat = s"${DiSLConfig.dislProgram} -d ${DiSLConfig.dislHome} -dc ${DiSLConfig.instProgram}{1} -cs ${DiSLConfig.instDir}"
+
+  val cmd = MainArguments.selectedUseCase match {
+    case UseCases.InvokeDynamic => MessageFormat.format(cmdFormat, "IntrumentationInvokeDynamic.class")
+    case UseCases.Matrix => MessageFormat.format(cmdFormat, "IntrumentationMatrix.class")
+    case default => MessageFormat.format(cmdFormat, "IntrumentationTest.class")
+  }
 
   def setup() = {
     val f = Future {

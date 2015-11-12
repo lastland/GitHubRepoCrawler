@@ -12,9 +12,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.liyaos.metabenchmark.MainArguments;
+import com.liyaos.metabenchmark.UseCases;
 import com.liyaos.metabenchmark.profiler.ArchiveDumper;
 import com.liyaos.metabenchmark.profiler.Dumper;
 import com.liyaos.metabenchmark.profiler.TTYDumper;
+
+import static com.liyaos.metabenchmark.MainArguments.*;
+import static com.liyaos.metabenchmark.UseCases.*;
 
 public class Profiler {
 
@@ -132,7 +136,16 @@ public class Profiler {
 
         invokeDynamicUsed = new ConcurrentHashMap<>();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(Profiler::dump));
+        switch(MainArguments.selectedUseCase()) {
+
+            case UseCases.Matrix:
+                Runtime.getRuntime().addShutdownHook(new Thread(ProfilerMatrix::dump));
+                break;
+
+            default:
+                Runtime.getRuntime().addShutdownHook(new Thread(Profiler::dump));
+                break;
+        }
     }
 
     private static int maximal(ConcurrentHashMap<Integer, Integer> distribute) {
@@ -165,18 +178,6 @@ public class Profiler {
                 executionTimes.entrySet().forEach(r ->
                         dumper.println("Execution time for " + r.getKey() + ": " + r.getValue()));
 
-//                dumper.println("====> Checking Matrix size");
-//                for (Map.Entry<Long, Integer> tuple : arraySizes.entrySet()) {
-//                    if (tuple.getValue() > MainArguments.matrixSizeTreshold()){
-//                        dumper.println("====> Found Matrix of size " + tuple.getValue());
-//
-//                        break;
-//                    }
-//                    else{
-//                        dumper.println("====> Discarded Matrix of size " + tuple.getValue());
-//                    }
-//                }
-//            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
