@@ -431,7 +431,7 @@ def run_server(args, parser):
 	s_cmd+= args.s_opts
 	if args.dc is not None:
 	    s_cmd+= ["-Ddisl.classes=" + args.dc]
-	s_cmd+= ["-cp", args.instrumentation + ":" + s_jar]
+	s_cmd+= ["-cp", args.instrumentation + ":" + s_jar + ":."]
 	s_cmd+= [s_class]
 	s_cmd+= args.s_args
 

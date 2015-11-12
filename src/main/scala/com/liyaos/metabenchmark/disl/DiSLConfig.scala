@@ -14,6 +14,6 @@ object DiSLConfig {
   lazy val instDir = installationDir + "/target/scala-2.11/classes"
   lazy val instProgram = instDir + "/com/liyaos/metabenchmark/instrumentation/Instrumentation.class"
   lazy val installationDir = new File(System.getProperty("user.dir")).getAbsolutePath
-
+  lazy val exclList = installationDir + "/src/main/resources/exclusion.lst"
   lazy val javaHome = config.getString("disl.java_home")
 }

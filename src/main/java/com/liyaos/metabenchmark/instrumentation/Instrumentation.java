@@ -7,10 +7,13 @@ import ch.usi.dag.disl.annotation.After;
 import ch.usi.dag.disl.annotation.AfterReturning;
 import ch.usi.dag.disl.annotation.Before;
 import ch.usi.dag.disl.annotation.SyntheticLocal;
+import ch.usi.dag.disl.annotation.ThreadLocal;
 import ch.usi.dag.disl.marker.BodyMarker;
 import ch.usi.dag.disl.marker.BytecodeMarker;
 import ch.usi.dag.disl.staticcontext.MethodStaticContext;
 import ch.usi.dag.disl.dynamiccontext.DynamicContext;
+
+import com.liyaos.metabenchmark.instrumentation.Guard.ClassToInstrumentOnly;
 import com.liyaos.metabenchmark.profiler.ArchiveDumper;
 import com.liyaos.metabenchmark.profiler.Dumper;
 
@@ -20,7 +23,18 @@ public class Instrumentation {
 
     @SyntheticLocal
     static long start;
+    
+    @ThreadLocal
+    static int methodInvocations = 0; //Old problem with double size variable allocation in DisL 2.1...
 
+    @Before(marker = BodyMarker.class, guard = ClassToInstrumentOnly.class)    
+    static void updateMethodInvocation(final DynamicContext dc) {
+    
+    	methodInvocations++;       
+    	   Profiler.setMethodInvocation(dc.getThis(),methodInvocations);
+    	
+    }
+    
     @Before(marker = BodyMarker.class, guard = GuardUnitTest.class)
     static void onMethodEntry(MethodStaticContext msc) {
         Profiler.startTimer(msc.thisMethodFullName());

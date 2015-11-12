@@ -114,6 +114,8 @@ public class Profiler {
     public static ConcurrentHashMap<String, Long> executionTimes;
 
     public static ConcurrentHashMap<Long, Integer> arraySizes;
+    
+    public static ConcurrentHashMap<Object, Long> methodInvocations;
 
     static {
         runnings = new ConcurrentHashMap<>();
@@ -127,6 +129,8 @@ public class Profiler {
         executionTimes = new ConcurrentHashMap<>();
 
         arraySizes = new ConcurrentHashMap<>();
+        
+        methodInvocations = new ConcurrentHashMap<>();
 
         Runtime.getRuntime().addShutdownHook(new Thread(Profiler::dump));
     }
@@ -153,11 +157,18 @@ public class Profiler {
     public static void runnings(Dumper dumper) {
         runnings.entrySet().forEach(r -> runnings(dumper, r.getKey(), r.getValue()));
     }
+    
+    public static void dumpMethodInvocations(Dumper dumper) {
+    	for (Object key: methodInvocations.keySet())
+    		dumper.println("Methods invocation for object "+ key.toString() + "are " + methodInvocations.get(key));
+    	
+    }
 
     public static void dump() {
         try {
             try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName())) {
                 runnings(dumper);
+                dumpMethodInvocations(dumper);
                 for (Map.Entry<Long, Integer> tuple : arraySizes.entrySet()) {
                     if (tuple.getValue() > MainArguments.matrixSizeTreshold()){
                         dumper.println("====> Found Matrix of size " + tuple.getValue());
@@ -217,4 +228,10 @@ public class Profiler {
         count.computeIfPresent(ob, (k, v) -> v + 1);
         count.computeIfAbsent(ob, k -> 1);
     }
+
+	public static void setMethodInvocation(Object ob, long inv) {
+		if (ob != null)
+			methodInvocations.put(ob, inv);
+		
+	}
 }

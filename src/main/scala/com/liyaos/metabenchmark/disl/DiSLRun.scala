@@ -16,7 +16,7 @@ class FailedStartDiSLServerException extends Exception
 class DiSLRun {
   var serverStarted = false
   var failed: Option[Throwable] = None
-  val cmd = s"${DiSLConfig.dislProgram} -d ${DiSLConfig.dislHome} -dc ${DiSLConfig.instProgram} -cs ${DiSLConfig.instDir}"
+  val cmd = s"${DiSLConfig.dislProgram} -d ${DiSLConfig.dislHome} -dc ${DiSLConfig.instProgram} -cs ${DiSLConfig.instDir} -s_exclusionlist ${DiSLConfig.exclList}"
 
   def setup() = {
     val f = Future {
