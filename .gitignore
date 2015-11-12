@@ -3,3 +3,5 @@ target
 FakeHome
 tmp
 threadpool
+/bin/
+/output-eclipse/

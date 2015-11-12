@@ -118,6 +118,8 @@ public class Profiler {
     public static ConcurrentHashMap<String, Long> executionTimes;
 
     public static ConcurrentHashMap<Long, Integer> arraySizes;
+    
+    public static ConcurrentHashMap<Object, String> methodInvocations;
 
     public static ConcurrentHashMap<String, Boolean> invokeDynamicUsed;
 
@@ -133,6 +135,8 @@ public class Profiler {
         executionTimes = new ConcurrentHashMap<>();
 
         arraySizes = new ConcurrentHashMap<>();
+        
+        methodInvocations = new ConcurrentHashMap<>();
 
         invokeDynamicUsed = new ConcurrentHashMap<>();
 
@@ -170,10 +174,32 @@ public class Profiler {
     public static void runnings(Dumper dumper) {
         runnings.entrySet().forEach(r -> runnings(dumper, r.getKey(), r.getValue()));
     }
+    
+    public static void dumpMethodInvocations(Dumper dumper) {
+    	for (Object key: methodInvocations.keySet())
+    	{	
+    		dumper.println("Method invoked: object "+ key + " ("+ key.getClass().toString() + ") - method: " + methodInvocations.get(key));
+    	}
+    }
 
     public static void dump() {
             try (Dumper dumper = new ArchiveDumper("results" + java.lang.management.ManagementFactory.getRuntimeMXBean().getName())) {
                 runnings(dumper);
+                dumpMethodInvocations(dumper);
+                
+//                for (Map.Entry<Long, Integer> tuple : arraySizes.entrySet()) {
+//                    if (tuple.getValue() > MainArguments.matrixSizeTreshold()){
+//                        dumper.println("====> Found Matrix of size " + tuple.getValue());
+//                        executionTimes.entrySet().forEach(r ->
+//                                dumper.println("Execution time for " + r.getKey() + ": " + r.getValue()));
+//                        break;
+//                    }
+//                    else{
+//                        dumper.println("====> Discarded Matrix of size " + tuple.getValue());
+//                    }
+//                }
+//            }
+
 
                 executionTimes.entrySet().forEach(r ->
                         dumper.println("Execution time for " + r.getKey() + ": " + r.getValue()));
@@ -229,4 +255,11 @@ public class Profiler {
         count.computeIfPresent(ob, (k, v) -> v + 1);
         count.computeIfAbsent(ob, k -> 1);
     }
+
+	public static void setMethodInvocation(Object ob, String method) {
+		if (ob != null) 
+			methodInvocations.put(ob,method);
+			
+		
+	}
 }
