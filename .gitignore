@@ -1,7 +1,0 @@
-target
-*.db
-FakeHome
-tmp
-threadpool
-/bin/
-/output-eclipse/

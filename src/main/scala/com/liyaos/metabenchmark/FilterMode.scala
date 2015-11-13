@@ -5,5 +5,5 @@ package com.liyaos.metabenchmark
  */
 object FilterMode extends Enumeration{
   type FilterMode = Value
-  val Imports, Body = Value
+  val Imports, Body, None = Value
 }
