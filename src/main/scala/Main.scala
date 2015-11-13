@@ -93,7 +93,7 @@ object Main extends App with StrictLogging {
           logger.info(s"Test results for $file: $exitCode")
         }
             } catch {
-     case e : com.liyaos.metabenchmark.tools.NoRecognizableBuildException => println( e )
+     case e : Exception => println( e )
        }
         
       }
