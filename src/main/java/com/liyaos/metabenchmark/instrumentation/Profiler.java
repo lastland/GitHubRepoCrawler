@@ -18,6 +18,37 @@ import com.liyaos.metabenchmark.profiler.TTYDumper;
 
 public class Profiler {
 
+	public static class ObjectAndMethod{
+    	Object object;
+    	String method;
+    	
+    	public ObjectAndMethod(Object object, String method) {
+    		this.object = object;
+    		this.method = method;
+    	}
+    	
+    	public int hashCode() {
+    	    return this.object.hashCode() ^ this.method.hashCode();
+    	}
+
+    	public boolean equals(Object obj) {
+    	      if (this == obj)
+    	            return true;
+    	      if (obj == null)
+    	            return false;
+    	      if (getClass() != obj.getClass())
+    	           return false;
+    	      ObjectAndMethod other = (ObjectAndMethod) obj;
+    	      if (this.object != other.object)
+    	            return false;
+    	      if (!this.method.equals(other.method))
+    	            return false;
+    	        return true;
+    	    }
+    	}
+    	
+    	
+    	
     public static class Pair<T1, T2> {
         public T1 key;
         public T2 value;
@@ -115,9 +146,14 @@ public class Profiler {
 
     public static ConcurrentHashMap<Long, Integer> arraySizes;
     
-    public static ConcurrentHashMap<Object, String> methodInvocations;
+    
+    
+        
+    public static ConcurrentHashMap<ObjectAndMethod, Integer> methodInvocations;
 
     public static ConcurrentHashMap<String, Boolean> invokeDynamicUsed;
+    
+    
 
     static {
         runnings = new ConcurrentHashMap<>();
@@ -163,9 +199,9 @@ public class Profiler {
     }
     
     public static void dumpMethodInvocations(Dumper dumper) {
-    	for (Object key: methodInvocations.keySet())
+    	for (ObjectAndMethod key: methodInvocations.keySet())
     	{	
-    		dumper.println("Method invoked: object "+ key + " ("+ key.getClass().toString() + ") - method: " + methodInvocations.get(key));
+    		dumper.println("MethodsInvoked,Object,"+ key.object.toString() + ",Class,"+ key.object.getClass() + ",Method," + key.method + ",NInvok," + methodInvocations.get(key));
     	}
     }
 
@@ -256,9 +292,14 @@ public class Profiler {
     }
 
 	public static void setMethodInvocation(Object ob, String method) {
-		if (ob != null) 
-			methodInvocations.put(ob,method);
-			
+		if (ob != null) { 
+			ObjectAndMethod om = new ObjectAndMethod(ob,method);
+			Integer invocations = methodInvocations.get(om);
+			if (invocations==null)
+				invocations = new Integer(1);
+			else invocations = new Integer(invocations.intValue()+1);
+			methodInvocations.put(om,invocations);
+		}	
 		
 	}
 }
