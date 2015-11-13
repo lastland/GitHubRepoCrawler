@@ -14,9 +14,9 @@ object DiSLJava extends ScriptInstaller {
   private val libSuffix = if (System.getProperty("os.name") == "Mac OS X") "jnilib" else "so"
   private val agent = s"${DiSLConfig.dislHome}/lib/libdislagent.$libSuffix"
   private val bypass = s"${DiSLConfig.dislHome}/lib/disl-bypass.jar"
-  private val bootClass = s"-Xbootclasspath/a:$bypass:${DiSLConfig.instDir}"
-  private val java = "which java".!!.stripLineEnd
+  private val bootClass = s"-Xbootclasspath/a:$bypass:${DiSLConfig.installationDir}/${DiSLConfig.instJar}"
   val fakeJavaHome = DiSLConfig.installationDir + "/FakeHome"
+  private val java = fakeJavaHome + "/bin/java"
 
   def content =
     s"""|#!/bin/bash

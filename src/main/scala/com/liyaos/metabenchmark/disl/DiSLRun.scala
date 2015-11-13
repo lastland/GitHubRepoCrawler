@@ -19,13 +19,8 @@ class FailedStartDiSLServerException extends Exception
 class DiSLRun {
   var serverStarted = false
   var failed: Option[Throwable] = None
-  val cmdFormat = s"${DiSLConfig.dislProgram} -d ${DiSLConfig.dislHome} -dc ${DiSLConfig.instProgram}{1} -cs ${DiSLConfig.instDir}"
 
-  val cmd = MainArguments.selectedUseCase match {
-    case UseCases.InvokeDynamic => MessageFormat.format(cmdFormat, "IntrumentationInvokeDynamic.class")
-    case UseCases.Matrix => MessageFormat.format(cmdFormat, "IntrumentationMatrix.class")
-    case default => MessageFormat.format(cmdFormat, "IntrumentationTest.class")
-  }
+  val cmd = s"${DiSLConfig.dislProgram} -d ${DiSLConfig.dislHome} -cs -i=${DiSLConfig.instJar}"
 
   def setup() = {
     val f = Future {
