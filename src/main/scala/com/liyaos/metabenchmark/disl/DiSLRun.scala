@@ -46,6 +46,7 @@ class DiSLRun {
   def run(f: => Unit) {
     synchronized {
       val fu = setup()
+      print(cmdFormat)
       try {
         Await.ready(fu, 5 seconds)
       } catch {
