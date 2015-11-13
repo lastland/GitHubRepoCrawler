@@ -24,7 +24,7 @@ class DiSLRun {
   val cmd = MainArguments.selectedUseCase match {
     case UseCases.InvokeDynamic => MessageFormat.format(cmdFormat, "IntrumentationInvokeDynamic.class")
     case UseCases.Matrix => MessageFormat.format(cmdFormat, "IntrumentationMatrix.class")
-    case default => MessageFormat.format(cmdFormat, "IntrumentationTest.class")
+    case default => MessageFormat.format(cmdFormat, "IntrumentationTestExecTime.class")
   }
 
   def setup() = {
