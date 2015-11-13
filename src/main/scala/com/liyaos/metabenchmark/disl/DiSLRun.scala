@@ -19,7 +19,7 @@ class FailedStartDiSLServerException extends Exception
 class DiSLRun {
   var serverStarted = false
   var failed: Option[Throwable] = None
-  val cmdFormat = s"${DiSLConfig.dislProgram} -d ${DiSLConfig.dislHome} -dc ${DiSLConfig.instProgram}%s -cs ${DiSLConfig.instDir}"
+  val cmdFormat = s"${DiSLConfig.dislProgram} -d ${DiSLConfig.dislHome} -dc ${DiSLConfig.instProgram}{0} -cs ${DiSLConfig.instDir}"
 
   val cmd = MainArguments.selectedUseCase match {
     case UseCases.InvokeDynamic => MessageFormat.format(cmdFormat, "IntrumentationInvokeDynamic.class")
