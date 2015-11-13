@@ -85,11 +85,17 @@ object Main extends App with StrictLogging {
       val files = new File(dir).list()
       val disl = new DiSLRun
       for (file <- files) {
+           try {
+        
         val tester = LocalGitHubRepo.getRepo(dir + file).getTester()
         disl.run {
           val exitCode = tester.test()
           logger.info(s"Test results for $file: $exitCode")
         }
+            } catch {
+     case e : Exception => println( e )
+       }
+        
       }
   }
 }

@@ -18,7 +18,7 @@ object MainArguments {
   var matrixSizeTreshold = 0
   val star=".*?";	// Non-greedy match on filler
 
-  val selectedUseCase = UseCases.ThreadPool;
+  val selectedUseCase = UseCases.Matrix;
 
   selectedUseCase match {
     case UseCases.ThreadPool => {

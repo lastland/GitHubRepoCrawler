@@ -29,20 +29,26 @@ final class Guard {
 
 	private static boolean __checkClassesAndInterfaces(final String className, Map<String, Boolean> hashMapCache, final Set<String> classesToCheck) {
 
+		try {
+		
 		// Quick lookup in hash map
 		final Boolean alreadyMatched = hashMapCache.get(className);
 
 		if (alreadyMatched == null) { // Class not already processed
 			
-			Class<?> cl = null;
 			boolean matches = false;
+			
+			
+			
+			Class<?> cl = null;
+			
 
 			// Check if this class is a specific class or implements a specific interface
-			try {
+			
 				cl = Class.forName(className);					
-			} catch (ClassNotFoundException e) {
-				//System.err.format("Error: Class %s not found!\n", className);				
-			}
+			
+								
+			
 
 			if (cl != null) {
 				matches = classesToCheck.contains(cl.getName());
@@ -61,13 +67,22 @@ final class Guard {
 				}
 			}
 
+			 		
+			
 			hashMapCache.put(className, matches);
 			return matches;
 
 		}
 
 		else 
-			return alreadyMatched.booleanValue(); 
+			return alreadyMatched.booleanValue();
+		}
+		
+		
+		catch (Exception e) {
+			System.err.format("Error: Class %s not found!\n", className);		
+			return false;
+		}	
 
 	}
 
