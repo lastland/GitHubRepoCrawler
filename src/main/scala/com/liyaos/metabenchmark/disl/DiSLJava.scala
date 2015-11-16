@@ -15,12 +15,13 @@ object DiSLJava extends ScriptInstaller {
   private val agent = s"${DiSLConfig.dislHome}/lib/libdislagent.$libSuffix"
   private val bypass = s"${DiSLConfig.dislHome}/lib/disl-bypass.jar"
   private val bootClass = s"-Xbootclasspath/a:$bypass:${DiSLConfig.instJar}"
+  private val superClass = s"-Ddisl.forcesuperclass=true"
   val fakeJavaHome = DiSLConfig.installationDir + "/FakeHome"
   private val java = fakeJavaHome + "/bin/java"
 
   def content =
     s"""|#!/bin/bash
-        |${java} -agentpath:$agent $bootClass $$@
+        |${java} -agentpath:$agent $bootClass $superClass $$@
      """.stripMargin
 
   val dir = fakeJavaHome + "/jre/bin/java"

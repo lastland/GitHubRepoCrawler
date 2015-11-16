@@ -502,9 +502,13 @@ def run_client(args, parser):
 		c_cmd+= ["-Xbootclasspath/a:"+bypass+":"+args.instrumentation]
 
 	if len(args.c_app) == 1:
-	    args.c_app = args.c_app[0].split(' ')
+		args.c_app = args.c_app[0].split(' ')
+
+
+	
 	c_cmd+= args.c_app
 
+	print "Ciao"
 	print c_cmd
 
 	client = run(c_cmd, args.c_out, args.c_err)
