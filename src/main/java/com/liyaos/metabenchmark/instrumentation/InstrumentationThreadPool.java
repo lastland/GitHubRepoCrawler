@@ -12,7 +12,7 @@ import com.liyaos.metabenchmark.instrumentation.Guard.ThreadPoolOnly;
 
 public class InstrumentationThreadPool {
 
-	 @Before(marker = BodyMarker.class, guard = ClassToInstrumentOnly.class)    
+	 @Before(marker = BodyMarker.class, guard = ThreadPoolOnly.class)    
 	     static void updateMethodInvocation(final DynamicContext dc, final MethodStaticContext msc) {
 	     
 	     Profiler.setMethodInvocation(dc.getThis(),msc.thisMethodFullName());

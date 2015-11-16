@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Executor;
@@ -164,21 +165,21 @@ final class Guard {
 //	}
 
 
-private static boolean __checkInterfacesOfClass(final Class<?> cl, final Set<String> interfacesToCheck) {
-	if (cl == null)
-		return false;
-
-	final Class<?>[] interfaces = cl.getInterfaces();
-
-	for (int i = 0; i < interfaces.length; i++) {
-		String ifName = interfaces[i].getName();
-		if (interfacesToCheck.contains(ifName))
-			return true;
-	}
-
-	return false;
-
-}
+//private static boolean __checkInterfacesOfClass(final Class<?> cl, final Set<String> interfacesToCheck) {
+//	if (cl == null)
+//		return false;
+//
+//	final Class<?>[] interfaces = cl.getInterfaces();
+//
+//	for (int i = 0; i < interfaces.length; i++) {
+//		String ifName = interfaces[i].getName();
+//		if (interfacesToCheck.contains(ifName))
+//			return true;
+//	}
+//
+//	return false;
+//
+//}
 
 //	static final class ThreadPoolOnly {
 //
@@ -215,16 +216,14 @@ static final class ThreadPoolOnly {
 			Executor.class, ExecutorService.class, AbstractExecutorService.class, ThreadPoolExecutor.class, ForkJoinPool.class
 			).stream ().map (Type::getType).collect (Collectors.toSet ());
 
-	//
 
 	static Map <String, Boolean> cachedResults = new HashMap <> ();
 
 	static Set <String> reportedMissing = new HashSet <> ();
 
-	//
 
 	@GuardMethod
-	public static boolean isRunnableOrCallable (final ReflectionStaticContext rsc
+	public static boolean isThreadPool (final ReflectionStaticContext rsc
 			) {
 		return __checkInterfaces (
 				rsc.thisClass (), cachedResults, interfacesToCheck, reportedMissing
