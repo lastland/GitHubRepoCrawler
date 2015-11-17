@@ -17,6 +17,8 @@ object Phase extends Enumeration {
   val Qualification, Filtering = Value
 }
 
+case class TimeOutException(r: GitHubRepo) extends Exception
+
 import Phase._
 case class FilterOutException(phase: Phase) extends Exception
 
@@ -72,9 +74,20 @@ object GitHubRepoTestRunner extends StrictLogging {
     try {
       val download = new GitHubDownloader(r)
       val tester = download.downloadTo(downloadDir).getTester()
-      disl.run {
-        val exitCode = tester.test()
-        logger.info(s"Test results for $r: $exitCode")
+      val f = Future {
+        disl.run {
+          val exitCode = tester.test()
+          logger.info(s"Test results for $r: $exitCode")
+        }
+      }
+      val timer = Future {
+        Thread.sleep(1000)
+        throw TimeOutException(r)
+      }
+      val run = Future.firstCompletedOf(Seq(f, timer))
+      run onFailure { case e: Throwable =>
+        tester.terminate()
+        throw TimeOutException(r)
       }
     } catch {
       case e: Throwable => logger.info(s"Exception on $r: $e")
